@@ -15,6 +15,7 @@ namespace Model.Models
         public string ShortDesc { get; set; }
         public int Priority { get; set; }
         public int ShippingPrice { get; set; }
+        public String ImageUrl { get; set; }
         public TvaType Tva { get; set; }
 
         public ICollection<BasketItem> Baskets { get; set; }

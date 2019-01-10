@@ -35,11 +35,25 @@ namespace Repositories.Repositories
             return obj;
         }
 
-        public T GetOne(Expression<Func<T, Boolean>> predicate)
+        public List<T> Get(Expression<Func<T, Boolean>> predicate)
         {
             var dbSet = context.Set<T>();
             var query = dbSet.Where(predicate);
-            return query.Single();
+            return query.ToList();
+        }
+        public T Put(T obj)
+        {
+            context.Attach(obj);
+            context.Set<T>().Update(obj);
+            context.SaveChanges();
+            return obj;
+        }
+
+        public bool Delete(T obj)
+        {
+            context.Attach(obj);
+            context.Set<T>().Remove(obj);
+            return context.SaveChanges();
         }
     }
 }

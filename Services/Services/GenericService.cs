@@ -9,26 +9,37 @@ namespace Services.Services
 {
     public class GenericService<T> : IGenericService<T> where T : class
     {
-        protected IGenericRepository<T> Repo;
+        protected IGenericRepository<T> _repository;
 
         public GenericService(IGenericRepository<T> repo)
         {
-            this.Repo = repo;
+            this._repository = repo;
         }
 
         public List<T> GetAll()
         {
-            return Repo.GetAll();
+            return _repository.GetAll();
         }
 
         public T Add(T obj)
         {
-            return Repo.Add(obj);
+            return _repository.Add(obj);
         }
 
-        public T GetOne(Expression<Func<T, Boolean>> predicate)
+        public List<T> Get(Expression<Func<T, Boolean>> predicate)
         {
-            return Repo.GetOne(predicate);
+            return _repository.Get(predicate);
+        }
+        
+
+        public T Put(T obj)
+        {
+            return _repository.Put(obj);
+        }
+
+        public T Delete(T obj)
+        {
+            return _repository.Delete(obj);
         }
     }
 }

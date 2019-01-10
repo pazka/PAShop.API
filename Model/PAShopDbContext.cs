@@ -40,10 +40,11 @@ namespace Model
             modelBuilder.Entity<Vendor>()
                 .HasMany<Item>(v => v.CreatedItems)
                 .WithOne(i => i.Creator);
-            
+
             modelBuilder.Entity<Basket>()
-                .HasOne<Transaction>(b => b.Transaction)
-                .WithOne(t => t.Order);
+                .HasOne(b => b.Transaction)
+                .WithOne(t => t.Order)
+                .HasForeignKey<Basket>( t => t.Id);
 
             modelBuilder.Entity<Basket>()
                 .HasMany<BasketItem>(b => b.Items)
@@ -67,6 +68,7 @@ namespace Model
 
             modelBuilder.Entity<BasketItem>()
                 .HasKey(x => new {x.BasketId, x.ItemId});
+            
         }
     }
 }

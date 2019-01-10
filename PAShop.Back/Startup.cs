@@ -16,12 +16,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Model;
+using Model.Models;
 using Repositories.Interfaces;
 using Repositories.Repositories;
 using Services.Interfaces;
 using Services.Services;
 
-namespace NFE104._1
+namespace PAShop.API
 {
     public class Startup
     {
@@ -33,14 +34,14 @@ namespace NFE104._1
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        //addScoped indicate what dependency to create
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<PAShopDbContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("PAShop")));
-            services.AddScoped<IGenericRepository, GenericRepository>();
-            services.AddScoped<IMovieService, MovieService>();
+                options.UseMySql(Configuration.GetConnectionString("PAShopDb")));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IGenericService<User>, UserService>();
             setupAuth(services);
         }
 
@@ -59,6 +60,8 @@ namespace NFE104._1
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
+            app.UseCookiePolicy();
+            app.UseSession();
         }
 
 

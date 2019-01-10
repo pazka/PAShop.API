@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Tests", "Services.Tests\Services.Tests.csproj", "{3A63B4D6-5112-4D98-BC85-B2DCD33443A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAShop.back", "PAShop.Back\PAShop.back.csproj", "{25B9A8B3-172A-4536-8743-747093C66EBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAShop.API", "PAShop.Back\PAShop.API.csproj", "{25B9A8B3-172A-4536-8743-747093C66EBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

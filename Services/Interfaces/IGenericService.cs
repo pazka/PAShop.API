@@ -9,6 +9,8 @@ namespace Services.Interfaces
     {
         List<T> GetAll();
         T Add(T obj);
-        T GetOne(Expression<Func<T, Boolean>> predicate);
+        List<T> Get(Expression<Func<T, Boolean>> predicate);
+        T Put(T obj);
+        T Delete(T obj);
     }
 }
