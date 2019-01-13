@@ -41,6 +41,7 @@ namespace Repositories.Repositories
             var query = dbSet.Where(predicate);
             return query.ToList();
         }
+
         public T Put(T obj)
         {
             context.Attach(obj);
@@ -49,11 +50,13 @@ namespace Repositories.Repositories
             return obj;
         }
 
-        public bool Delete(T obj)
+        public T Delete(T obj)
         {
             context.Attach(obj);
             context.Set<T>().Remove(obj);
-            return context.SaveChanges();
+            context.SaveChanges();
+
+            return context.Set<T>().Find(obj);
         }
     }
 }

@@ -70,6 +70,8 @@ namespace Model.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<string>("ImageUrl");
+
                     b.Property<string>("Label");
 
                     b.Property<float>("Price_HT");
@@ -133,6 +135,8 @@ namespace Model.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Address");
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("Discriminator")
                         .IsRequired();

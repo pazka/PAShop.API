@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -37,12 +39,18 @@ namespace PAShop.API
         //addScoped indicate what dependency to create
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddSessionStateTempDataProvider();
+            services.AddSession();
             services.AddDbContext<PAShopDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("PAShopDb")));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddScoped<DbContext, PAShopDbContext>();
             services.AddScoped<IGenericService<User>, UserService>();
-            setupAuth(services);
+            services.AddScoped<IUserRepository, UserRepository>();
+            SetupAuth(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,10 +70,11 @@ namespace PAShop.API
             app.UseMvc();
             app.UseCookiePolicy();
             app.UseSession();
+            app.UseMvcWithDefaultRoute();
         }
 
 
-        private void setupAuth(IServiceCollection services)
+        private void SetupAuth(IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

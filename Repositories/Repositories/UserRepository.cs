@@ -8,20 +8,21 @@ using Repositories.Interfaces;
 
 namespace Repositories.Repositories
 {
-    public class UserRepository : GenericRepository<User>
+    public class UserRepository :  GenericRepository<User>, IUserRepository
     {
         public UserRepository(DbContext dbContextType) : base(dbContextType)
         {
         }
 
-        public new bool Delete(Guid id)
+        public User Delete(Guid id)
         {
-            User user = this.Get(u => u.Id == id).Single();
+            var dbSet = context.Set<User>();
+            var query = dbSet.Where(u => u.Id == id);
+            User user = query.SingleOrDefault();
 
-            //TODO always null ?
-            if (user.Deleted || user == null)
+            if (user == null)
             {
-                return false;
+                return null;
             }
 
             context.Attach(user);
@@ -29,7 +30,7 @@ namespace Repositories.Repositories
             context.Set<User>().Update(user);
             context.SaveChanges();
 
-            return true;
+            return user;
         }
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Model.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class remoteDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,6 +18,7 @@ namespace Model.Migrations
                     Name = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
                     Address = table.Column<string>(nullable: true),
+                    Deleted = table.Column<bool>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
                     Siret = table.Column<string>(nullable: true),
                     Brand = table.Column<string>(nullable: true)
@@ -38,6 +39,7 @@ namespace Model.Migrations
                     ShortDesc = table.Column<string>(nullable: true),
                     Priority = table.Column<int>(nullable: false),
                     ShippingPrice = table.Column<int>(nullable: false),
+                    ImageUrl = table.Column<string>(nullable: true),
                     Tva = table.Column<int>(nullable: false),
                     CreatorId = table.Column<Guid>(nullable: true)
                 },

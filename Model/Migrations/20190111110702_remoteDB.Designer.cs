@@ -9,8 +9,8 @@ using Model;
 namespace Model.Migrations
 {
     [DbContext(typeof(PAShopDbContext))]
-    [Migration("20190110134012_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20190111110702_remoteDB")]
+    partial class remoteDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -71,6 +71,8 @@ namespace Model.Migrations
                     b.Property<Guid?>("CreatorId");
 
                     b.Property<string>("Description");
+
+                    b.Property<string>("ImageUrl");
 
                     b.Property<string>("Label");
 
@@ -135,6 +137,8 @@ namespace Model.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Address");
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("Discriminator")
                         .IsRequired();

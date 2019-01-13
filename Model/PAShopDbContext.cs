@@ -68,7 +68,8 @@ namespace Model
 
             modelBuilder.Entity<BasketItem>()
                 .HasKey(x => new {x.BasketId, x.ItemId});
-            
+
+            modelBuilder.Entity<User>().Ignore(p => p.Token);
         }
     }
 }

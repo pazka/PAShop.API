@@ -19,11 +19,7 @@ namespace PAShop.API.Helper
 
         public User Authenticate(User login)
         {
-            return new User()
-            {
-                Email = "mfromenteau@capcod.eu",
-                Password = "ouaisouais"
-            };
+            return login;
         }
 
         public string BuildToken(User user)

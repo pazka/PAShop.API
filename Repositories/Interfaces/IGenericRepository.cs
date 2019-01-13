@@ -12,6 +12,6 @@ namespace Repositories.Interfaces
         T Add(T obj);
         List<T> Get(Expression<Func<T, Boolean>> predicate);
         T Put(T obj);
-        bool Delete(T obj);
+        T Delete(T obj);
     }
 }
