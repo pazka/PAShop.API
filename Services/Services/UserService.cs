@@ -21,14 +21,23 @@ namespace Services.Services
             this.Sha1 = new SHA1CryptoServiceProvider();
         }
 
-        internal String hash(String s)
+        internal string Hash(string text)
         {
-            return BitConverter.ToString(Sha1.ComputeHash(Encoding.UTF8.GetBytes(s)));
+
+            if (String.IsNullOrEmpty(text))
+                return String.Empty;
+
+            using (var sha = new System.Security.Cryptography.SHA256Managed())
+            {
+                byte[] textData = System.Text.Encoding.UTF8.GetBytes(text);
+                byte[] hash = sha.ComputeHash(textData);
+                return BitConverter.ToString(hash).Replace("-", String.Empty);
+            }
         }
 
-        public User Add(User user)
+        public new User Add(User user)
         {   
-            user.Password = this.hash(user.Password);
+            user.PasswordHash = this.Hash(user.Password);
             Sha1.Clear();
 
             return this._repository.Add(user);
@@ -37,7 +46,7 @@ namespace Services.Services
         public User Authenticate(string login, string password)
         {
             User user = _repository
-                .Get(u => (u.Email == login || u.Login == login) && (u.Password.Equals(this.hash(password)))).Single();
+                .Get(u => u.Email == login  && (u.PasswordHash.Equals(this.Hash(password)))).SingleOrDefault();
 
             if (user == null)
             {

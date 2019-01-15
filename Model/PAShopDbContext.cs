@@ -70,6 +70,8 @@ namespace Model
                 .HasKey(x => new {x.BasketId, x.ItemId});
 
             modelBuilder.Entity<User>().Ignore(p => p.Token);
+            modelBuilder.Entity<User>()
+                .HasIndex(p => new {p.Email}).IsUnique();
         }
     }
 }

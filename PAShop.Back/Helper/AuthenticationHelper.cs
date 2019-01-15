@@ -5,21 +5,28 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Model.Models;
+using Services.Interfaces;
 
 namespace PAShop.API.Helper
 {
     public class AuthenticationHelper
     {
         private readonly IConfiguration _config;
+        private readonly IUserService _userService;
 
-        public AuthenticationHelper(IConfiguration config)
+        public AuthenticationHelper(IConfiguration config, IUserService userService)
         {
             _config = config;
+            _userService = userService;
         }
 
-        public User Authenticate(User login)
+        public AuthenticationHelper()
         {
-            return login;
+        }
+
+        public User Authenticate(dynamic login)
+        {
+            return this._userService.Authenticate((string)login.Email, (string)login.Password);
         }
 
         public string BuildToken(User user)

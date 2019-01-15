@@ -25,7 +25,7 @@ namespace Services.Tests.Services
         }
 
         [TestMethod]
-        public void GivenUserExists_WhenDeleteUser_ThenReturnIsTrue()
+        public void GivenUserExists_WhenDeleteUser_ThenReturnUserDeleted()
         {
             var mock = new Mock<IUserRepository>();
             User user = new User()
@@ -34,15 +34,15 @@ namespace Services.Tests.Services
                 Name = "Test",
                 LastName = "Lasttest",
                 Address = "2 rue du osef",
-                Deleted = false
+                Deleted = true
             };
 
             mock.Setup(p => p.Delete(user.Id))
-                .Returns(true);
+                .Returns(user);
 
             var service = new UserService(mock.Object);
             var res = service.Delete(user.Id);
-            Assert.IsTrue(res);
+            Assert.IsTrue(res.Deleted);
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace Services.Tests.Services
 
             var service = new UserService(mock.Object);
             var res = service.Delete(user.Id);
-            Assert.IsFalse(res);
+            Assert.IsTrue(res.Deleted);
         }
     }
 }

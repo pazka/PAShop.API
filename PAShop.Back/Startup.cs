@@ -49,6 +49,7 @@ namespace PAShop.API
 
             services.AddScoped<DbContext, PAShopDbContext>();
             services.AddScoped<IGenericService<User>, UserService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
             SetupAuth(services);
         }

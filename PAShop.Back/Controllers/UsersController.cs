@@ -56,13 +56,6 @@ namespace PAShop.API.Controllers
             return userList.Single();
         }
 
-        // POST api/<controller>/login
-        [HttpPost("login")]
-        public ActionResult Login([FromBody] dynamic form)
-        {
-            return _userService.Authenticate(form.login,form.password);
-        }
-
         // PUT api/<controller>/5
         [HttpPut("{id}")]
         [Authorize(Roles = "User")]

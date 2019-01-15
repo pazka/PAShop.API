@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace Model.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        public Guid Id { get; set; }
+        public new Guid Id { get; set; }
         public bool Deleted { get; set; }
 
         [Required]
-        public string Email { get; set; }
-        public string Login { get; set; }
+        public new string Email { get; set; }
 
         [Required]
         public string Password { get; set; }
