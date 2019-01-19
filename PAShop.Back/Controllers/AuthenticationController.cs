@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Model.Models;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using PAShop.API.Helper;
 using Services.Interfaces;
 using Services.Services;
@@ -51,8 +52,7 @@ namespace PAShop.API.Controllers
                 return BadRequest("I don't know you");
             }
 
-            return Ok(email.Value);
+            return Ok(_authenticationHelper.GetUserService().Get(u => u.Email == email.Value));
         }
-
     }
 }

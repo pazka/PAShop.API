@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Pages.Account.Internal;
@@ -27,10 +29,18 @@ namespace PAShop.API.Controllers
         }
 
         // POST api/<controller>
-        [HttpPost("new")]
+        [HttpPost()]
         public ActionResult<User> New([FromBody]User user)
         {
-            return _userService.Add(user);
+            
+            User newUser = _userService.Add(user);
+
+            if (newUser == null)
+            {
+                return new BadRequestObjectResult($"User with email : {user.Email} already exist");
+            }
+
+            return Ok(user);
         }
 
         // GET api/<controller>/all
@@ -65,14 +75,30 @@ namespace PAShop.API.Controllers
         }
 
         // DELETE api/<controller>/5
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("")]
+        [Authorize(Roles = "User")]
+        public ActionResult DeleteSelf()
+        {
+            User user = _userService.Get(u => u.Email == HttpContext.User.FindFirst(ClaimTypes.Email).Value).SingleOrDefault();
+
+            if (user == null)
+                return StatusCode(500, "User not found");
+
+            if (_userService.Delete(user.Id) == null)
+                return StatusCode(500, "User could not be deleted");
+
+            return StatusCode(200, User);
+        }
+
+        // DELETE api/<controller>/5
+        [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public ActionResult Delete(Guid id)
         {
             if (_userService.Delete(id) == null)
                 return StatusCode(500, "User not found");
 
-            return StatusCode(200,User);
+            return StatusCode(200, User);
         }
     }
 }

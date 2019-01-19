@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,6 +14,7 @@ namespace PAShop.API.Helper
     {
         private readonly IConfiguration _config;
         private readonly IUserService _userService;
+        
 
         public AuthenticationHelper(IConfiguration config, IUserService userService)
         {
@@ -24,6 +26,11 @@ namespace PAShop.API.Helper
         {
         }
 
+        public IUserService GetUserService()
+        {
+            return this._userService;
+        }
+
         public User Authenticate(dynamic login)
         {
             return this._userService.Authenticate((string)login.Email, (string)login.Password);
@@ -31,14 +38,15 @@ namespace PAShop.API.Helper
 
         public string BuildToken(User user)
         {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, user.Id.ToString())
-            };
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            Claim[] claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UnixEpoch.ToLongDateString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
+            };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Issuer"],
                 claims,

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Model.Models
 {
+    public enum Role { Admin, LoggedUser }
     public class User : IdentityUser
     {
         public new Guid Id { get; set; }
@@ -22,6 +23,7 @@ namespace Model.Models
         public string LastName { get; set; }
         [Required]
         public string Address { get; set; }
+        public Role Role { get; set; }
         public string Token { get; set; }
 
         public ICollection<Basket> Baskets { get; set; }

@@ -40,6 +40,11 @@ namespace Services.Services
             user.PasswordHash = this.Hash(user.Password);
             Sha1.Clear();
 
+            if (_repository.Get(u => u.Email == user.Email).Count > 0)
+            {
+                return null;
+            }
+
             return this._repository.Add(user);
         }
 
@@ -47,11 +52,6 @@ namespace Services.Services
         {
             User user = _repository
                 .Get(u => u.Email == login  && (u.PasswordHash.Equals(this.Hash(password)))).SingleOrDefault();
-
-            if (user == null)
-            {
-                return null;
-            }
 
             //authenticate
 

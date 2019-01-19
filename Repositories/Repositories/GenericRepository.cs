@@ -30,7 +30,7 @@ namespace Repositories.Repositories
         {
             context.Attach(obj);
             context.Set<T>().Add(obj);
-
+            
             context.SaveChanges();
             return obj;
         }

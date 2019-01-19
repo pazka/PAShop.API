@@ -23,6 +23,7 @@ using Repositories.Interfaces;
 using Repositories.Repositories;
 using Services.Interfaces;
 using Services.Services;
+using static Model.Models.Role;
 
 namespace PAShop.API
 {
@@ -92,6 +93,13 @@ namespace PAShop.API
                             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("User", policy => policy.RequireRole(LoggedUser.ToString()));
+                options.AddPolicy("Vendor", policy => policy.RequireRole(Admin.ToString()));
+                options.AddPolicy("Admin", policy => policy.RequireRole(Admin.ToString()));
+            });
         }
     }
 }
