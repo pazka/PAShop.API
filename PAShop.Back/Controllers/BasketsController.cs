@@ -78,34 +78,6 @@ namespace PAShop.API.Controllers
             }
         }
 
-        // POST: api/Baskets
-        [HttpPost]
-        public IActionResult PostBasket([FromBody] Basket basket)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                basket = _service.Add(basket);
-            }
-            catch (DbUpdateException)
-            {
-                if (BasketExists(basket.Id))
-                {
-                    return new StatusCodeResult(StatusCodes.Status409Conflict);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetBasket", new { id = basket.Id }, basket);
-        }
-
         [HttpPost("{id}/add")]
         public IActionResult AddItem([FromRoute] Guid id, Item item)
         {

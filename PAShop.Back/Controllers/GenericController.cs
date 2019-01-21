@@ -68,7 +68,7 @@ namespace PAShop.API.Controllers
 
         // POST: api/Baskets
         [HttpPost]
-        public IActionResult Post([FromBody] dynamic obj) {
+        public IActionResult New([FromBody] dynamic obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
