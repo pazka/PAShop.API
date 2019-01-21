@@ -14,17 +14,17 @@ namespace PAShop.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GenericController : ControllerBase
+    public class GenericController<T> : ControllerBase where T : class, IGenericModel
     {
-        private readonly IGenericService<IGenericModel> _service;
+        private readonly IGenericService<T> _service;
 
-        public GenericController(IGenericService<IGenericModel> service) {
+        public GenericController(IGenericService<T> service) {
             _service = service;
         }
 
         // GET: api/Baskets
         [HttpGet]
-        public IEnumerable<IGenericModel> Get() {
+        public IEnumerable<T> Get() {
             return _service.GetAll();
         }
 

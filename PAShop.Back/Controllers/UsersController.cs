@@ -44,7 +44,7 @@ namespace PAShop.API.Controllers
         }
 
         // GET api/<controller>/all
-        [HttpGet("all")]
+        [HttpGet("")]
         public ActionResult<IEnumerable<User>> All()
         {
             return _userService.GetAll();

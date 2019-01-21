@@ -14,12 +14,12 @@ namespace PAShop.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BasketsController : ControllerBase
+    public class BasketsController : GenericController<Basket>
     {
         private readonly IGenericService<Basket> _service;
         private readonly IGenericService<Item> _itemService;
 
-        public BasketsController(IGenericService<Basket> service)
+        public BasketsController(IGenericService<Basket> service) : base(service)
         {
             _service = service;
         }
