@@ -24,7 +24,7 @@ namespace PAShop.API.Controllers
 
         // GET: api/Baskets
         [HttpGet]
-        public IEnumerable<T> Get() {
+        public IEnumerable<T> GetAll() { 
             return _service.GetAll();
         }
 
@@ -46,7 +46,7 @@ namespace PAShop.API.Controllers
 
         // PUT: api/Baskets/5
         [HttpPut("{id}")]
-        public IActionResult PutBasket([FromRoute] Guid id, [FromBody] dynamic obj) {
+        public IActionResult Put([FromRoute] Guid id, [FromBody] dynamic obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -68,7 +68,7 @@ namespace PAShop.API.Controllers
 
         // POST: api/Baskets
         [HttpPost]
-        public IActionResult PostBasket([FromBody] dynamic obj) {
+        public IActionResult Post([FromBody] dynamic obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
