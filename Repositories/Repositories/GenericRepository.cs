@@ -10,7 +10,7 @@ using Repositories.Interfaces;
 
 namespace Repositories.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class,IGenericModel
     {
         protected DbContext context;
 
@@ -45,6 +45,7 @@ namespace Repositories.Repositories
         public T Put(T obj)
         {
             context.Attach(obj);
+            context.Entry(obj).State = EntityState.Modified;
             context.Set<T>().Update(obj);
             context.SaveChanges();
             return obj;

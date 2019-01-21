@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Model.Models
 {
     public enum Role { Admin, LoggedUser }
-    public class User : IdentityUser
+    public class User : IdentityUser,IGenericModel
     {
         public new Guid Id { get; set; }
         public bool Deleted { get; set; }

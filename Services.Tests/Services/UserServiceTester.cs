@@ -15,40 +15,19 @@ namespace Services.Tests.Services
         [TestClass]
         public class UserServicesTester
     {
-        private IUserRepository _repository;
+        private IGenericRepository<User> _repository;
         private UserService _service;
 
         public UserServicesTester()
         {
-            _repository = new UserRepository(null);
+            _repository = new GenericRepository<User>(null);
             _service = new UserService(_repository);
-        }
-
-        [TestMethod]
-        public void GivenUserExists_WhenDeleteUser_ThenReturnUserDeleted()
-        {
-            var mock = new Mock<IUserRepository>();
-            User user = new User()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test",
-                LastName = "Lasttest",
-                Address = "2 rue du osef",
-                Deleted = true
-            };
-
-            mock.Setup(p => p.Delete(user.Id))
-                .Returns(user);
-
-            var service = new UserService(mock.Object);
-            var res = service.Delete(user.Id);
-            Assert.IsTrue(res.Deleted);
         }
 
         [TestMethod]
         public void GivenUserDeleted_WhenDeleteUser_ThenReturnIsFalse()
         {
-            var mock = new Mock<IUserRepository>();
+            var mock = new Mock<IGenericRepository<User>>();
             User user = new User()
             {
                 Name = "Test",

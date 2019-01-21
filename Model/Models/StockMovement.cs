@@ -6,7 +6,7 @@ namespace Model.Models
 {
     public enum StockMovementType { Reserved, Stolen, Regular};
 
-    public class StockMovement
+    public class StockMovement : IGenericModel
     {
         public Guid Id { get; set; }
         public int Amount { get; set; }

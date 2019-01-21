@@ -49,9 +49,16 @@ namespace PAShop.API
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped<DbContext, PAShopDbContext>();
-            services.AddScoped<IGenericService<User>, UserService>();
+            services.AddScoped<IGenericRepository<Basket>, GenericRepository<Basket>>();
+            services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
+            services.AddScoped<IGenericRepository<Inventory>, GenericRepository<Inventory>>();
+            services.AddScoped<IGenericRepository<Item>, GenericRepository<Item>>();
+            services.AddScoped<IGenericRepository<StockMovement>, GenericRepository<StockMovement>>();
+            services.AddScoped<IGenericRepository<Transaction>, GenericRepository<Transaction>>();
+            services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
+            services.AddScoped<IGenericService<User>, GenericService<User>>();
+            services.AddScoped<IGenericService<Basket>, GenericService<Basket>>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserRepository, UserRepository>();
             SetupAuth(services);
         }
 

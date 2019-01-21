@@ -6,7 +6,7 @@ using Model.Models;
 
 namespace Repositories.Interfaces
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericRepository<T> where T : IGenericModel
     {
         List<T> GetAll();
         T Add(T obj);

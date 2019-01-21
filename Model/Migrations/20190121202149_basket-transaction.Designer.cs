@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Model;
 
 namespace Model.Migrations
 {
     [DbContext(typeof(PAShopDbContext))]
-    partial class PAShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190121202149_basket-transaction")]
+    partial class baskettransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,9 +28,14 @@ namespace Model.Migrations
 
                     b.Property<string>("State");
 
+                    b.Property<Guid>("TransactionId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("TransactionId")
+                        .IsUnique();
 
                     b.ToTable("Baskets");
                 });
@@ -110,16 +117,11 @@ namespace Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("OrderId");
-
                     b.Property<string>("State");
 
                     b.Property<Guid?>("UserId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -207,6 +209,11 @@ namespace Model.Migrations
                     b.HasOne("Model.Models.User", "Owner")
                         .WithMany("Baskets")
                         .HasForeignKey("OwnerId");
+
+                    b.HasOne("Model.Models.Transaction", "Transaction")
+                        .WithOne("Order")
+                        .HasForeignKey("Model.Models.Basket", "TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Model.Models.Inventory", b =>
@@ -240,11 +247,6 @@ namespace Model.Migrations
 
             modelBuilder.Entity("Model.Models.Transaction", b =>
                 {
-                    b.HasOne("Model.Models.Basket", "Order")
-                        .WithOne("Transaction")
-                        .HasForeignKey("Model.Models.Transaction", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Model.Models.User", "User")
                         .WithMany("Payments")
                         .HasForeignKey("UserId");

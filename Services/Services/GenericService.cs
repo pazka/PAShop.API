@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Model.Models;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
 namespace Services.Services
 {
-    public class GenericService<T> : IGenericService<T> where T : class
+    public class GenericService<T> : IGenericService<T> where T : class,IGenericModel
     {
         protected IGenericRepository<T> _repository;
 
@@ -41,6 +43,11 @@ namespace Services.Services
         {
 
             return _repository.Delete(obj);
+        }
+
+        public bool Exists(Guid id)
+        {
+            return _repository.Get(x => x.Id == id).Count == 1;
         }
     }
 }

@@ -14,8 +14,6 @@ namespace Model
         public virtual DbSet<StockMovement> StockMovements { get; set; }
         public virtual DbSet<Transaction> Transactions { get; set; }
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<Vendor> Vendors { get; set; }
-
 
         public PAShopDbContext()
         {
@@ -37,18 +35,13 @@ namespace Model
                 .HasMany<Transaction>(u => u.Payments)
                 .WithOne(t => t.User);
 
-            modelBuilder.Entity<Vendor>()
-                .HasMany<Item>(v => v.CreatedItems)
-                .WithOne(i => i.Creator);
-
             modelBuilder.Entity<Basket>()
                 .HasOne(b => b.Transaction)
                 .WithOne(t => t.Order)
-                .HasForeignKey<Basket>( t => t.Id);
+                .HasForeignKey<Transaction>( t => t.OrderId);
 
             modelBuilder.Entity<Basket>()
-                .HasMany<BasketItem>(b => b.Items)
-                .WithOne(bi => bi.Basket);
+                .HasMany<Item>(b => b.Items);
 
             modelBuilder.Entity<Item>()
                 .HasMany<StockMovement>(i => i.StockMovements)
@@ -58,16 +51,9 @@ namespace Model
                 .HasMany<Inventory>(i => i.Inventories)
                 .WithOne(i => i.Item);
 
-            modelBuilder.Entity<Item>()
-                .HasMany<BasketItem>(i => i.Baskets)
-                .WithOne(bi => bi.Item);
-
             modelBuilder.Entity<StockMovement>()
                 .HasOne<Inventory>(i => i.LastInventory)
                 .WithMany(i => i.StockMovements);
-
-            modelBuilder.Entity<BasketItem>()
-                .HasKey(x => new {x.BasketId, x.ItemId});
 
             modelBuilder.Entity<User>().Ignore(p => p.Token);
             modelBuilder.Entity<User>()

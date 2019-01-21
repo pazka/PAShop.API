@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Model.Models
 {
-    public class Inventory
+    public class Inventory : IGenericModel
     {
         public Guid Id { get; set; }
         public int Quantity { get; set; }

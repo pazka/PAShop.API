@@ -13,9 +13,9 @@ namespace Services.Services
     public class UserService : GenericService<User>, IUserService
     {
         private SHA1CryptoServiceProvider Sha1;
-        private new IUserRepository _repository;
+        private new IGenericRepository<User> _repository;
 
-        public UserService(IUserRepository repo) : base(repo)
+        public UserService(IGenericRepository<User> repo) : base(repo)
         {
             this._repository = repo;
             this.Sha1 = new SHA1CryptoServiceProvider();
@@ -60,7 +60,16 @@ namespace Services.Services
 
         public User Delete(Guid id)
         {
-            return _repository.Delete(id);
+            User user = _repository.Get(u => u.Id == id).SingleOrDefault();
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Deleted = true;
+
+            return _repository.Put(user);
         }
     }
 }

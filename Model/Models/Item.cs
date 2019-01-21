@@ -6,7 +6,7 @@ namespace Model.Models
 {
     public enum TvaType { Food = 25, Object = 10 };
 
-    public class Item
+    public class Item : IGenericModel
     {
         public Guid Id { get; set; }
         public float Price_HT { get; set; }
@@ -17,9 +17,8 @@ namespace Model.Models
         public int ShippingPrice { get; set; }
         public String ImageUrl { get; set; }
         public TvaType Tva { get; set; }
-
-        public ICollection<BasketItem> Baskets { get; set; }
-        public Vendor Creator { get; set; }
+        
+        public User Creator { get; set; }
         public ICollection<StockMovement> StockMovements { get; set; }
         public ICollection<Inventory> Inventories { get; set; }
     }

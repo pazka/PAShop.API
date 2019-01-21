@@ -23,7 +23,7 @@ namespace PAShop.API.Controllers
     {
         private readonly UserService _userService;
     
-        public UsersController(IGenericService<User> us)
+        public UsersController(IUserService us)
         {
             this._userService = (UserService)us;
         }
@@ -58,8 +58,8 @@ namespace PAShop.API.Controllers
         {
             List<User> userList = _userService.Get(u => u.Id == id);
 
-            if (userList.Any())
-                return NotFound("Not user at this id");
+            if (!userList.Any())
+                return NotFound("No user at this id");
             if (userList.Count > 1)
                 return NotFound("Several users at this Id");
 
@@ -69,8 +69,20 @@ namespace PAShop.API.Controllers
         // PUT api/<controller>/5
         [HttpPut("{id}")]
         [Authorize(Roles = "User")]
-        public ActionResult<User> Put([FromRoute]int id, [FromBody]User user)
+        public ActionResult<User> Put([FromRoute]Guid id, [FromBody]User user)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != user.Id)
+            {
+                return BadRequest();
+            }
+
+
             return _userService.Put(user);
         }
 
@@ -81,13 +93,18 @@ namespace PAShop.API.Controllers
         {
             User user = _userService.Get(u => u.Email == HttpContext.User.FindFirst(ClaimTypes.Email).Value).SingleOrDefault();
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (user == null)
-                return StatusCode(500, "User not found");
+                return NotFound();
 
             if (_userService.Delete(user.Id) == null)
                 return StatusCode(500, "User could not be deleted");
 
-            return StatusCode(200, User);
+            return Ok(User);
         }
 
         // DELETE api/<controller>/5
@@ -95,10 +112,17 @@ namespace PAShop.API.Controllers
         [Authorize(Roles = "Admin")]
         public ActionResult Delete(Guid id)
         {
-            if (_userService.Delete(id) == null)
-                return StatusCode(500, "User not found");
+            User user;
 
-            return StatusCode(200, User);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if ((user = _userService.Delete(id)) == null)
+                return NotFound();
+
+            return Ok(user);
         }
     }
 }
