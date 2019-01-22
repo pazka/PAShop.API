@@ -22,7 +22,7 @@ namespace PAShop.API.Controllers
         private readonly IGenericService<Item> _itemService;
         private readonly IUserService _userService;
 
-        public BasketsController(IGenericService<Basket> service, IHttpContextAccessor httpContextAccessor, IUserService userService) : base(service)
+        public BasketsController(IGenericService<Basket> service, IHttpContextAccessor httpContextAccessor, IUserService userService) : base(service,httpContextAccessor)
         {
             _userService = userService;
         }

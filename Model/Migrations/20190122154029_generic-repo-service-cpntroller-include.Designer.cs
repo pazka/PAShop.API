@@ -9,8 +9,8 @@ using Model;
 namespace Model.Migrations
 {
     [DbContext(typeof(PAShopDbContext))]
-    [Migration("20190115221152_identity-mig")]
-    partial class identitymig
+    [Migration("20190122154029_generic-repo-service-cpntroller-include")]
+    partial class genericreposervicecpntrollerinclude
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,30 +21,18 @@ namespace Model.Migrations
 
             modelBuilder.Entity("Model.Models.Basket", b =>
                 {
-                    b.Property<Guid>("Id");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<Guid?>("OwnerId");
 
-                    b.Property<string>("State");
+                    b.Property<int>("State");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Baskets");
-                });
-
-            modelBuilder.Entity("Model.Models.BasketItem", b =>
-                {
-                    b.Property<Guid>("BasketId");
-
-                    b.Property<Guid>("ItemId");
-
-                    b.HasKey("BasketId", "ItemId");
-
-                    b.HasIndex("ItemId");
-
-                    b.ToTable("BasketItem");
                 });
 
             modelBuilder.Entity("Model.Models.Inventory", b =>
@@ -68,13 +56,16 @@ namespace Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<Guid?>("BasketId");
+
                     b.Property<Guid?>("CreatorId");
 
                     b.Property<string>("Description");
 
                     b.Property<string>("ImageUrl");
 
-                    b.Property<string>("Label");
+                    b.Property<string>("Label")
+                        .IsRequired();
 
                     b.Property<float>("Price_HT");
 
@@ -82,11 +73,14 @@ namespace Model.Migrations
 
                     b.Property<int>("ShippingPrice");
 
-                    b.Property<string>("ShortDesc");
+                    b.Property<string>("ShortDesc")
+                        .IsRequired();
 
                     b.Property<int>("Tva");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BasketId");
 
                     b.HasIndex("CreatorId");
 
@@ -100,7 +94,7 @@ namespace Model.Migrations
 
                     b.Property<int>("Amount");
 
-                    b.Property<Guid?>("ItemId");
+                    b.Property<Guid>("ItemId");
 
                     b.Property<Guid?>("LastInventoryId");
 
@@ -120,11 +114,16 @@ namespace Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<Guid>("OrderId");
+
                     b.Property<string>("State");
 
                     b.Property<Guid?>("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -136,97 +135,38 @@ namespace Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AccessFailedCount");
-
                     b.Property<string>("Address")
                         .IsRequired();
 
-                    b.Property<string>("ConcurrencyStamp");
-
                     b.Property<bool>("Deleted");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
 
                     b.Property<string>("Email")
                         .IsRequired();
 
-                    b.Property<bool>("EmailConfirmed");
-
                     b.Property<string>("LastName")
                         .IsRequired();
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<string>("Login");
 
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.Property<string>("NormalizedEmail");
-
-                    b.Property<string>("NormalizedUserName");
-
                     b.Property<string>("Password")
                         .IsRequired();
 
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName");
+                    b.Property<int>("Role");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("Users");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
-                });
-
-            modelBuilder.Entity("Model.Models.Vendor", b =>
-                {
-                    b.HasBaseType("Model.Models.User");
-
-                    b.Property<string>("Brand");
-
-                    b.Property<string>("Siret");
-
-                    b.ToTable("Vendor");
-
-                    b.HasDiscriminator().HasValue("Vendor");
                 });
 
             modelBuilder.Entity("Model.Models.Basket", b =>
                 {
-                    b.HasOne("Model.Models.Transaction", "Transaction")
-                        .WithOne("Order")
-                        .HasForeignKey("Model.Models.Basket", "Id")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Model.Models.User", "Owner")
                         .WithMany("Baskets")
                         .HasForeignKey("OwnerId");
-                });
-
-            modelBuilder.Entity("Model.Models.BasketItem", b =>
-                {
-                    b.HasOne("Model.Models.Basket", "Basket")
-                        .WithMany("Items")
-                        .HasForeignKey("BasketId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Model.Models.Item", "Item")
-                        .WithMany("Baskets")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Model.Models.Inventory", b =>
@@ -238,8 +178,12 @@ namespace Model.Migrations
 
             modelBuilder.Entity("Model.Models.Item", b =>
                 {
-                    b.HasOne("Model.Models.Vendor", "Creator")
-                        .WithMany("CreatedItems")
+                    b.HasOne("Model.Models.Basket")
+                        .WithMany("Items")
+                        .HasForeignKey("BasketId");
+
+                    b.HasOne("Model.Models.User", "Creator")
+                        .WithMany()
                         .HasForeignKey("CreatorId");
                 });
 
@@ -247,7 +191,8 @@ namespace Model.Migrations
                 {
                     b.HasOne("Model.Models.Item", "Item")
                         .WithMany("StockMovements")
-                        .HasForeignKey("ItemId");
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Model.Models.Inventory", "LastInventory")
                         .WithMany("StockMovements")
@@ -256,6 +201,11 @@ namespace Model.Migrations
 
             modelBuilder.Entity("Model.Models.Transaction", b =>
                 {
+                    b.HasOne("Model.Models.Basket", "Order")
+                        .WithOne("Transaction")
+                        .HasForeignKey("Model.Models.Transaction", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Model.Models.User", "User")
                         .WithMany("Payments")
                         .HasForeignKey("UserId");

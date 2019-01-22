@@ -133,50 +133,24 @@ namespace Model.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AccessFailedCount");
-
                     b.Property<string>("Address")
                         .IsRequired();
-
-                    b.Property<string>("ConcurrencyStamp");
 
                     b.Property<bool>("Deleted");
 
                     b.Property<string>("Email")
                         .IsRequired();
 
-                    b.Property<bool>("EmailConfirmed");
-
                     b.Property<string>("LastName")
                         .IsRequired();
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
 
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.Property<string>("NormalizedEmail");
-
-                    b.Property<string>("NormalizedUserName");
-
                     b.Property<string>("Password")
                         .IsRequired();
 
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
                     b.Property<int>("Role");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName");
 
                     b.HasKey("Id");
 

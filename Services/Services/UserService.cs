@@ -37,7 +37,7 @@ namespace Services.Services
 
         public new User Add(User user)
         {   
-            user.PasswordHash = this.Hash(user.Password);
+            user.Password = this.Hash(user.Password);
             Sha1.Clear();
 
             if (_repository.Get(u => u.Email == user.Email).Count > 0)
@@ -51,7 +51,7 @@ namespace Services.Services
         public User Authenticate(string login, string password)
         {
             User user = _repository
-                .Get(u => u.Email == login  && (u.PasswordHash.Equals(this.Hash(password)))).SingleOrDefault();
+                .Get(u =>  u.Email == login  && u.Password.Equals(this.Hash(password))).FirstOrDefault();
 
             //authenticate
 

@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Identity;
 namespace Model.Models
 {
     public enum Role { Admin, LoggedUser }
-    public class User : IdentityUser,IGenericModel
+    public class User : IGenericModel
     {
-        public new Guid Id { get; set; }
+        public Guid Id { get; set; }
         public bool Deleted { get; set; }
 
         [Required]
-        public new string Email { get; set; }
+        public  string Email { get; set; }
 
         [Required]
         public string Password { get; set; }

@@ -41,7 +41,7 @@ namespace Repositories.Repositories
         public List<T> Get(Expression<Func<T, Boolean>> predicate)
         {
             var dbSet = context.Set<T>();
-            var query = context.Set<T>().AsQueryable();
+            var query = dbSet.Where(predicate).AsQueryable();
 
             foreach (PropertyInfo prop in typeof(T).GetProperties()) {
                 if (Attribute.IsDefined(prop, typeof(IncludeProperty)))
@@ -49,8 +49,6 @@ namespace Repositories.Repositories
                     query.Include(prop.Name);
                 }
             }
-
-            query.Where(predicate);
 
             return query.ToList();
         }
