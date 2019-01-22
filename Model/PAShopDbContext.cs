@@ -27,6 +27,14 @@ namespace Model
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Item>().HasKey(x => x.Id);
+            modelBuilder.Entity<Inventory>().HasKey(x => x.Id);
+            modelBuilder.Entity<Basket>().HasKey(x => x.Id);
+            modelBuilder.Entity<StockMovement>().HasKey(x => x.Id);
+            modelBuilder.Entity<Transaction>().HasKey(x => x.Id);
+            modelBuilder.Entity<User>().HasKey(x => x.Id);
+
+
             modelBuilder.Entity<User>()
                 .HasMany<Basket>(u => u.Baskets)
                 .WithOne(b => b.Owner);

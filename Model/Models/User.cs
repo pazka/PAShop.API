@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using EFCustomAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Model.Models
@@ -26,7 +27,9 @@ namespace Model.Models
         public Role Role { get; set; }
         public string Token { get; set; }
 
+        [IncludeProperty]
         public ICollection<Basket> Baskets { get; set; }
+
         public ICollection<Transaction> Payments { get; set; }
     }
 }

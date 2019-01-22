@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +20,11 @@ namespace PAShop.API.Controllers
     {
         private readonly IGenericService<Basket> _service;
         private readonly IGenericService<Item> _itemService;
+        private readonly IUserService _userService;
 
-        public BasketsController(IGenericService<Basket> service) : base(service)
+        public BasketsController(IGenericService<Basket> service, IHttpContextAccessor httpContextAccessor, IUserService userService) : base(service)
         {
-            _service = service;
+            _userService = userService;
         }
 
         // GET: api/Baskets
@@ -29,6 +32,32 @@ namespace PAShop.API.Controllers
         public IEnumerable<Basket> GetBaskets()
         {
             return _service.GetAll();
+        }
+
+        [HttpGet("mine")]
+        [Authorize(Roles = "User")]
+        public IActionResult GetMyBasket()
+        {
+            var currentUser = _httpContextAccessor.HttpContext.User;
+            var email = currentUser.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (currentUser == null || email == null)
+            {
+                return BadRequest("I don't know you");
+            }
+
+            User user = _userService.Get(u => u.Email == email.Value).SingleOrDefault();
+
+
+            try
+            {
+                return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Ok(_service.Add(new Basket(){State = State.NotValidated,Owner = user}));
+            }
+
         }
 
         // GET: api/Baskets/5

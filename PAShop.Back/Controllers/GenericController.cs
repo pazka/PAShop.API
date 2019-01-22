@@ -16,10 +16,12 @@ namespace PAShop.API.Controllers
     [ApiController]
     public class GenericController<T> : ControllerBase where T : class, IGenericModel
     {
-        private readonly IGenericService<T> _service;
+        protected readonly IGenericService<T> _service;
+        protected readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GenericController(IGenericService<T> service) {
+        public GenericController(IGenericService<T> service, IHttpContextAccessor httpContextAccessor) {
             _service = service;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/Baskets
@@ -46,7 +48,7 @@ namespace PAShop.API.Controllers
 
         // PUT: api/Baskets/5
         [HttpPut("{id}")]
-        public IActionResult Put([FromRoute] Guid id, [FromBody] dynamic obj) {
+        public IActionResult Put([FromRoute] Guid id, [FromBody] T obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -68,7 +70,7 @@ namespace PAShop.API.Controllers
 
         // POST: api/Baskets
         [HttpPost]
-        public IActionResult New([FromBody] dynamic obj) {
+        public IActionResult New([FromBody] T obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }

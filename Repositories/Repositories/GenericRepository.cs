@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
+using EFCustomAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Model;
 using Model.Models;
@@ -23,6 +25,7 @@ namespace Repositories.Repositories
         {
             var dbSet = context.Set<T>();
             var query = dbSet.AsQueryable();
+
             return query.ToList();
         }
 
@@ -38,7 +41,17 @@ namespace Repositories.Repositories
         public List<T> Get(Expression<Func<T, Boolean>> predicate)
         {
             var dbSet = context.Set<T>();
-            var query = dbSet.Where(predicate);
+            var query = context.Set<T>().AsQueryable();
+
+            foreach (PropertyInfo prop in typeof(T).GetProperties()) {
+                if (Attribute.IsDefined(prop, typeof(IncludeProperty)))
+                {
+                    query.Include(prop.Name);
+                }
+            }
+
+            query.Where(predicate);
+
             return query.ToList();
         }
 
