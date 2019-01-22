@@ -40,7 +40,15 @@ namespace PAShop.API
         //addScoped indicate what dependency to create
         public void ConfigureServices(IServiceCollection services) {
 
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("YOYO", b =>
+                {
+                    b.AllowAnyHeader();
+                    b.AllowAnyMethod();
+                    b.AllowAnyOrigin();
+                });
+            });
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddSessionStateTempDataProvider();
@@ -90,6 +98,7 @@ namespace PAShop.API
             app.UseCors(builder =>
                 builder.WithOrigins("https://localhost:44336/")
                     .AllowAnyHeader()
+                    .AllowAnyMethod()
             );
         }
 

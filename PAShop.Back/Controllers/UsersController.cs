@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.UI.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace PAShop.API.Controllers
 {
 
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController, EnableCors("YOYO")]
     public class UsersController : Controller
     {
         private readonly UserService _userService;
