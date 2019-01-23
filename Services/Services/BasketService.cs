@@ -33,5 +33,16 @@ namespace Services.Services
 
             return basket;
         }
+
+        public double GetTotalPrice(Basket basket)
+        {
+            double res = 0;
+            foreach (BasketItem basketItem in basket.BasketItems)
+            {
+                res += basketItem.Item.Price_HT * basketItem.Quantity + basketItem.Item.ShippingPrice;
+            }
+
+            return res;
+        }
     }
 }
