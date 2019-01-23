@@ -19,11 +19,13 @@ namespace PAShop.API.Controllers
     [ApiController, EnableCors("CORS")]
     public class BasketsController : GenericController<Basket>
     {
+        private new readonly IBasketService _service;
         private readonly IGenericService<Item> _itemService;
         private readonly IUserService _userService;
 
-        public BasketsController(IGenericService<Basket> service, IHttpContextAccessor httpContextAccessor, IUserService userService, IGenericService<Item> itemService) : base(service,httpContextAccessor)
+        public BasketsController(IBasketService service, IHttpContextAccessor httpContextAccessor, IUserService userService, IGenericService<Item> itemService) : base(service,httpContextAccessor)
         {
+            _service = service;
             _userService = userService;
             _itemService = itemService;
         }
@@ -77,8 +79,7 @@ namespace PAShop.API.Controllers
                 }
             }
 
-            Basket basketuser = user.Baskets.SingleOrDefault(b => b.State == State.NotValidated);
-            Basket basket = _service.Get(basketuser.Id);
+            Basket basket = _service.Mine(_httpContextAccessor.HttpContext.User);
             
             basket.BasketItems.Add(new BasketItem()
             {
@@ -102,21 +103,8 @@ namespace PAShop.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            Item item;
-
-            try {
-                item = _itemService.Get(itemId);
-            }
-            catch (DbUpdateException) {
-                if (_itemService.Exists(itemId)) {
-                    return NotFound();
-                }
-                else {
-                    throw;
-                }
-            }
-
-        //    user.Baskets.SingleOrDefault(b => b.State == State.NotValidated)?.BasketItems.Remove();
+            Basket basket = _service.Mine(_httpContextAccessor.HttpContext.User);
+            
 
             return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
         }

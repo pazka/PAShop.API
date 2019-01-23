@@ -6,6 +6,7 @@ namespace Model.Models
 {
     public class BasketItem
     {
+        public Guid id { get; set; }
         public Basket Basket { get; set; }
         public Item Item { get; set; }
         public Guid BasketId { get; set; }

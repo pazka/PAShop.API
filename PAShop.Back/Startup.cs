@@ -19,6 +19,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Model;
 using Model.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Repositories.Interfaces;
 using Repositories.Repositories;
 using Services.Interfaces;
@@ -51,7 +53,12 @@ namespace PAShop.API
             });
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddSessionStateTempDataProvider();
+                .AddSessionStateTempDataProvider()
+                .AddJsonOptions(options => {
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                }); ;
+
             services.AddSession();
             services.AddDbContext<PAShopDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("PAShopDb")));
@@ -70,6 +77,7 @@ namespace PAShop.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGenericService<User>, GenericService<User>>();
             services.AddScoped<IGenericService<Basket>, GenericService<Basket>>();
+            services.AddScoped<IBasketService, BasketService>();
             services.AddScoped<IGenericService<Inventory>, GenericService<Inventory>>();
             services.AddScoped<IGenericService<Item>, GenericService<Item>>();
             services.AddScoped<IGenericService<StockMovement>, GenericService<StockMovement>>();
