@@ -39,6 +39,8 @@ namespace Model.Migrations
 
                     b.Property<Guid>("ItemId");
 
+                    b.Property<int>("Quantity");
+
                     b.HasKey("BasketId", "ItemId");
 
                     b.HasIndex("ItemId");

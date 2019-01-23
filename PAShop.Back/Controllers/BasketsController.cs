@@ -80,18 +80,25 @@ namespace PAShop.API.Controllers
             }
 
             Basket basket = _service.Mine(_httpContextAccessor.HttpContext.User);
-            
-            basket.BasketItems.Add(new BasketItem()
+
+            try
             {
-                Basket = basket,
-                BasketId = basket.Id,
-                Item = item,
-                ItemId = item.Id
-            });
+                basket.BasketItems.SingleOrDefault(bi => bi.ItemId == itemId).Quantity++;
+
+            }
+            catch (Exception)
+            {
+                basket.BasketItems.Add( new BasketItem()
+                {
+                    BasketId = basket.Id,
+                    ItemId = item.Id,
+                    Quantity = 1
+                });
+            }
 
             _service.Put(basket);
 
-            return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
+            return Ok(_service.Mine(_httpContextAccessor.HttpContext.User));
         }
 
         [HttpPost("remove/{itemId}")]
@@ -104,14 +111,26 @@ namespace PAShop.API.Controllers
             }
 
             Basket basket = _service.Mine(_httpContextAccessor.HttpContext.User);
-            
+            BasketItem basketItem;
 
-            return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
-        }
+            try
+            {
+                basketItem = basket.BasketItems.SingleOrDefault(bi => bi.ItemId == itemId);
+            }
+            catch (Exception)
+            {
+                return NotFound("Item not in basket.");
+            }
 
-        private bool BasketExists(Guid id)
-        {
-            return _service.Get(e => e.Id == id).Count == 1;
+            basket.BasketItems.Remove(basketItem);
+            basketItem.Quantity--;
+
+            if(basketItem.Quantity >  0)
+                basket.BasketItems.Add(basketItem);
+                
+            _service.Put(basket);
+
+            return Ok(_service.Mine(_httpContextAccessor.HttpContext.User));
         }
     }
 }

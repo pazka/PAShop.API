@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Model.Migrations
 {
-    public partial class genericreposervicecpntrollerinclude : Migration
+    public partial class basketitemquantity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -57,18 +57,11 @@ namespace Model.Migrations
                     ShippingPrice = table.Column<int>(nullable: false),
                     ImageUrl = table.Column<string>(nullable: true),
                     Tva = table.Column<int>(nullable: false),
-                    CreatorId = table.Column<Guid>(nullable: true),
-                    BasketId = table.Column<Guid>(nullable: true)
+                    CreatorId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Items", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Items_Baskets_BasketId",
-                        column: x => x.BasketId,
-                        principalTable: "Baskets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Items_Users_CreatorId",
                         column: x => x.CreatorId,
@@ -101,6 +94,31 @@ namespace Model.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BasketItem",
+                columns: table => new
+                {
+                    BasketId = table.Column<Guid>(nullable: false),
+                    ItemId = table.Column<Guid>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BasketItem", x => new { x.BasketId, x.ItemId });
+                    table.ForeignKey(
+                        name: "FK_BasketItem_Baskets_BasketId",
+                        column: x => x.BasketId,
+                        principalTable: "Baskets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BasketItem_Items_ItemId",
+                        column: x => x.ItemId,
+                        principalTable: "Items",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -150,6 +168,11 @@ namespace Model.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_BasketItem_ItemId",
+                table: "BasketItem",
+                column: "ItemId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Baskets_OwnerId",
                 table: "Baskets",
                 column: "OwnerId");
@@ -158,11 +181,6 @@ namespace Model.Migrations
                 name: "IX_Inventories_ItemId",
                 table: "Inventories",
                 column: "ItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Items_BasketId",
-                table: "Items",
-                column: "BasketId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Items_CreatorId",
@@ -200,6 +218,9 @@ namespace Model.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BasketItem");
+
+            migrationBuilder.DropTable(
                 name: "StockMovements");
 
             migrationBuilder.DropTable(
@@ -209,10 +230,10 @@ namespace Model.Migrations
                 name: "Inventories");
 
             migrationBuilder.DropTable(
-                name: "Items");
+                name: "Baskets");
 
             migrationBuilder.DropTable(
-                name: "Baskets");
+                name: "Items");
 
             migrationBuilder.DropTable(
                 name: "Users");

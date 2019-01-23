@@ -9,8 +9,8 @@ using Model;
 namespace Model.Migrations
 {
     [DbContext(typeof(PAShopDbContext))]
-    [Migration("20190123014952_many-to-many-shit")]
-    partial class manytomanyshit
+    [Migration("20190123094340_basketitemquantity")]
+    partial class basketitemquantity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -40,6 +40,8 @@ namespace Model.Migrations
                     b.Property<Guid>("BasketId");
 
                     b.Property<Guid>("ItemId");
+
+                    b.Property<int>("Quantity");
 
                     b.HasKey("BasketId", "ItemId");
 
