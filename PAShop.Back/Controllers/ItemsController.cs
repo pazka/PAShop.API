@@ -16,7 +16,7 @@ namespace PAShop.API.Controllers
     public class ItemsController : GenericController<Item>
     {
         private IGenericService<StockMovement> _serviceStockMovement;
-        public ItemsController(IGenericService<Item> service, IGenericService<StockMovement> serviceStockMovement,HttpContextAccessor httpContextAccessor) : base(service,httpContextAccessor)
+        public ItemsController(IGenericService<Item> service,IHttpContextAccessor httpContextAccessor, IGenericService<StockMovement> serviceStockMovement) : base(service,httpContextAccessor)
         {
             _serviceStockMovement = serviceStockMovement;
         }
