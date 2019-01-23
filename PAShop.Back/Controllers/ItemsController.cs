@@ -23,7 +23,7 @@ namespace PAShop.API.Controllers
 
 
         [HttpPost("{id}")]
-        public IActionResult ChangeQuantity([FromRoute] Guid id, StockMovement stockMovement) {
+        public IActionResult ChangeQuantityDisp([FromRoute] Guid id, StockMovement stockMovement) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -49,6 +49,17 @@ namespace PAShop.API.Controllers
             stockMovement.Item = item;
 
             return Ok(_serviceStockMovement.Get(sm => sm.Item.Id == id));
+        }
+
+        [HttpGet("search")]
+        public IActionResult Search([FromQuery] string tags)
+        {
+            string[] tags_arr = tags.Split();
+
+            //laids mais pas le choix 
+            List < Item > allItems = _service.GetAll();
+
+            return Ok(allItems.Where(i=> i.Label.Split().Intersect(tags_arr).Any()));
         }
     }
 }
