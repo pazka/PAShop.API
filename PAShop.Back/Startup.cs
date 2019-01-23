@@ -19,6 +19,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Model;
 using Model.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Repositories.Interfaces;
 using Repositories.Repositories;
 using Services.Interfaces;
@@ -40,18 +42,16 @@ namespace PAShop.API
         //addScoped indicate what dependency to create
         public void ConfigureServices(IServiceCollection services) {
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("YOYO", b =>
-                {
-                    b.AllowAnyHeader();
-                    b.AllowAnyMethod();
-                    b.AllowAnyOrigin();
-                });
-            });
+            services.AddCors();
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddSessionStateTempDataProvider();
+
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
+
             services.AddSession();
             services.AddDbContext<PAShopDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("PAShopDb")));
@@ -98,7 +98,6 @@ namespace PAShop.API
             app.UseCors(builder =>
                 builder.WithOrigins("https://localhost:44336/")
                     .AllowAnyHeader()
-                    .AllowAnyMethod()
             );
         }
 
@@ -124,7 +123,7 @@ namespace PAShop.API
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("User", policy => policy.RequireRole(LoggedUser.ToString()));
-                options.AddPolicy("Vendor", policy => policy.RequireRole(Admin.ToString()));
+                options.AddPolicy("Vendor", policy => policy.RequireRole(Vendor.ToString()));
                 options.AddPolicy("Admin", policy => policy.RequireRole(Admin.ToString()));
             });
         }

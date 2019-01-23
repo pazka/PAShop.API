@@ -18,40 +18,31 @@ namespace PAShop.API.Controllers
     [ApiController]
     public class BasketsController : GenericController<Basket>
     {
-        private readonly IGenericService<Basket> _service;
         private readonly IGenericService<Item> _itemService;
         private readonly IUserService _userService;
 
-        public BasketsController(IGenericService<Basket> service, IHttpContextAccessor httpContextAccessor, IUserService userService) : base(service,httpContextAccessor)
+        public BasketsController(IGenericService<Basket> service, IHttpContextAccessor httpContextAccessor, IUserService userService, IGenericService<Item> itemService) : base(service,httpContextAccessor)
         {
             _userService = userService;
+            _itemService = itemService;
         }
 
         // GET: api/Baskets
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IEnumerable<Basket> GetBaskets()
         {
             return _service.GetAll();
         }
 
         [HttpGet("mine")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "LoggedUser")]
         public IActionResult GetMyBasket()
         {
-            var currentUser = _httpContextAccessor.HttpContext.User;
-            var email = currentUser.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (currentUser == null || email == null)
-            {
-                return BadRequest("I don't know you");
-            }
-
-            User user = _userService.Get(u => u.Email == email.Value).SingleOrDefault();
-
-
+            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
             try
             {
-                return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
+                return Ok(user.Baskets);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -60,131 +51,73 @@ namespace PAShop.API.Controllers
 
         }
 
-        // GET: api/Baskets/5
-        [HttpGet("{id}")]
-        public IActionResult GetBasket([FromRoute] Guid id)
+        [HttpPost("add/{itemId}")]
+        [Authorize(Roles = "LoggedUser")]
+        public IActionResult AddItem(Guid itemId)
         {
+            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            var basket = _service.Get(b => b.Id == id).SingleOrDefault();
-
-            if (basket == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(basket);
-        }
-
-        // PUT: api/Baskets/5
-        [HttpPut("{id}")]
-        public IActionResult PutBasket([FromRoute] Guid id, [FromBody] Basket basket)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != basket.Id)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                return Ok(_service.Put(basket));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BasketExists(id))
-                {
-                    return NotFound();
-                }
-                    throw;
-            }
-        }
-
-        [HttpPost("{id}/add")]
-        public IActionResult AddItem([FromRoute] Guid id, Item item)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            Basket basket;
-
-            try
-            {
-                basket = _service.Get(b => b.Id == id).SingleOrDefault();
-            }
-            catch (DbUpdateException)
-            {
-                if (BasketExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            
-            basket.Items.Add(item);
-
-            return CreatedAtAction("GetBasket", new { id = basket.Id }, basket);
-        }
-
-        [HttpPost("{id}/remove")]
-        public IActionResult RemoveItem([FromRoute] Guid basketId, Guid itemId)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            Basket basket;
-
-            try
-            {
-                basket = _service.Get(b => b.Id == basketId).SingleOrDefault();
-            }
-            catch (DbUpdateException)
-            {
-                if (BasketExists(basketId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
             }
 
             Item item;
 
-            try
-            {
-                item = _itemService.Get(i => i.Id == basketId).SingleOrDefault();
+            try {
+               item = _itemService.Get(itemId);
             }
-            catch (DbUpdateException)
-            {
-                if (_itemService.Exists(itemId))
-                {
+            catch (DbUpdateException) {
+                if (_itemService.Exists(itemId)) {
                     return NotFound();
                 }
-                else
-                {
+                else {
                     throw;
                 }
             }
 
-            basket.Items.Remove(item);
+            Basket basketuser = user.Baskets.SingleOrDefault(b => b.State == State.NotValidated);
+            Basket basket = _service.Get(basketuser.Id);
+            
+            basket.BasketItems.Add(new BasketItem()
+            {
+                Basket = basket,
+                BasketId = basket.Id,
+                Item = item,
+                ItemId = item.Id
+            });
 
-            return CreatedAtAction("GetBasket", new { id = basket.Id }, basket);
+            _service.Put(basket);
+
+            return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
+        }
+
+        [HttpPost("remove/{itemId}")]
+        [Authorize(Roles = "LoggedUser")]
+        public IActionResult RemoveItem(Guid itemId) {
+            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
+
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            Item item;
+
+            try {
+                item = _itemService.Get(itemId);
+            }
+            catch (DbUpdateException) {
+                if (_itemService.Exists(itemId)) {
+                    return NotFound();
+                }
+                else {
+                    throw;
+                }
+            }
+
+        //    user.Baskets.SingleOrDefault(b => b.State == State.NotValidated)?.BasketItems.Remove();
+
+            return Ok(user.Baskets.SingleOrDefault(b => b.State == State.NotValidated));
         }
 
         private bool BasketExists(Guid id)

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using EFCustomAnnotations;
 
 namespace Model.Models
 {
-    public enum StockMovementType { Reserved, Stolen, Regular};
+    public enum StockMovementType {Reserved = 0,Stolen = 1,Regular = 2};
 
     public class StockMovement : IGenericModel
     {
@@ -15,6 +16,7 @@ namespace Model.Models
         public int Amount { get; set; }
         public DateTime Timestamp { get; set; }
         [Required]
+        [DefaultValue(StockMovementType.Regular)]
         public static StockMovementType Type { get; set; }
 
         [Required]

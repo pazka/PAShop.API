@@ -46,7 +46,7 @@ namespace Repositories.Repositories
             foreach (PropertyInfo prop in typeof(T).GetProperties()) {
                 if (Attribute.IsDefined(prop, typeof(IncludeProperty)))
                 {
-                    query.Include(prop.Name);
+                    query = query.Include(prop.Name);
                 }
             }
 

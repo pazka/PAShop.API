@@ -23,6 +23,11 @@ namespace Services.Services
             return _repository.GetAll();
         }
 
+        public T Get(Guid id)
+        {
+            return _repository.Get(x => x.Id == id).SingleOrDefault();
+        }
+
         public T Add(T obj)
         {
             return _repository.Add(obj);

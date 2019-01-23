@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using EFCustomAnnotations;
@@ -7,7 +8,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Model.Models
 {
-    public enum Role { Admin, LoggedUser }
+    public enum Role{Admin = 0,LoggedUser = 1,Vendor = 2}
+
     public class User : IGenericModel
     {
         public Guid Id { get; set; }
@@ -24,6 +26,7 @@ namespace Model.Models
         public string LastName { get; set; }
         [Required]
         public string Address { get; set; }
+        [DefaultValue(Role.LoggedUser)]
         public Role Role { get; set; }
         public string Token { get; set; }
 
