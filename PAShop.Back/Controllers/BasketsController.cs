@@ -42,15 +42,16 @@ namespace PAShop.API.Controllers
         [Authorize(Roles = "LoggedUser")]
         public IActionResult GetMyBasket()
         {
-            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
-            try
-            {
-                return Ok(user.Baskets);
+            Basket basket;
+            try {
+                basket = _service.Mine(_httpContextAccessor.HttpContext.User);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                return Ok(_service.Add(new Basket(){State = State.NotValidated,Owner = user}));
+                return NotFound();
             }
+
+            return Ok(basket);
 
         }
 
@@ -122,7 +123,7 @@ namespace PAShop.API.Controllers
             }
 
             if (basketItem == null) {
-                return Ok(_service.Mine(_httpContextAccessor.HttpContext.User));
+                return Ok(_service.Mine(_httpContextAccessor.HttpContext.User)); 
             }
 
             basket.BasketItems.Remove(basketItem);
