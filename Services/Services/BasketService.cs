@@ -12,9 +12,11 @@ namespace Services.Services
     public class BasketService : GenericService<Basket>, IBasketService
     {
         private IGenericRepository<User> _userRepository;
+        private IGenericRepository<Item> _itemRepository;
 
-        public BasketService(IGenericRepository<Basket> repo,IGenericRepository<User> userRepository) : base(repo)
+        public BasketService(IGenericRepository<Basket> repo,IGenericRepository<User> userRepository, IGenericRepository<Item> itemRepository) : base(repo)
         {
+            _itemRepository = itemRepository;
             _userRepository = userRepository;
         }
 
@@ -22,9 +24,14 @@ namespace Services.Services
             var email = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
 
             User user = _userRepository.Get(u => u.Email == email.Value).SingleOrDefault();
-
-            return _repository.Get(b => b.Owner.Id == user.Id && b.State == State.NotValidated )
+            Basket basket = _repository.Get(b => b.Owner.Id == user.Id && b.State == State.NotValidated)
                 .SingleOrDefault();
+
+            foreach (BasketItem basketItem in basket.BasketItems) {
+                basketItem.Item = _itemRepository.Get(i => i.Id == basketItem.ItemId).SingleOrDefault();
+            }
+
+            return basket;
         }
     }
 }

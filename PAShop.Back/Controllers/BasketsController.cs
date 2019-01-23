@@ -84,7 +84,6 @@ namespace PAShop.API.Controllers
             try
             {
                 basket.BasketItems.SingleOrDefault(bi => bi.ItemId == itemId).Quantity++;
-
             }
             catch (Exception)
             {
@@ -122,8 +121,12 @@ namespace PAShop.API.Controllers
                 return NotFound("Item not in basket.");
             }
 
+            if (basketItem == null) {
+                return Ok(_service.Mine(_httpContextAccessor.HttpContext.User));
+            }
+
             basket.BasketItems.Remove(basketItem);
-            basketItem.Quantity--;
+                basketItem.Quantity--;
 
             if(basketItem.Quantity >  0)
                 basket.BasketItems.Add(basketItem);
