@@ -42,7 +42,7 @@ namespace PAShop.API
 
             services.AddCors(options =>
             {
-                options.AddPolicy("YOYO", b =>
+                options.AddPolicy("CORS", b =>
                 {
                     b.AllowAnyHeader();
                     b.AllowAnyMethod();

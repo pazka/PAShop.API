@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using Services.Interfaces;
 namespace PAShop.API.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController, EnableCors("CORS")]
     public class ItemsController : GenericController<Item>
     {
         private IGenericService<StockMovement> _serviceStockMovement;

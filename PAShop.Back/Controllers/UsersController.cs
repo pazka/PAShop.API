@@ -19,7 +19,7 @@ namespace PAShop.API.Controllers
 {
 
     [Route("api/[controller]")]
-    [ApiController, EnableCors("YOYO")]
+    [ApiController, EnableCors("CORS")]
     public class UsersController : Controller
     {
         private readonly UserService _userService;

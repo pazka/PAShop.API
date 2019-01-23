@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using PAShop.API.Helper;
 using Services.Interfaces;
 using Services.Services;
+using Microsoft.AspNetCore.Cors;
 
 namespace PAShop.API.Controllers
 {
     [Route("api/auth")]
-    [ApiController]
+    [ApiController, EnableCors("CORS")]
     public class AuthenticationController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -42,6 +43,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpGet("me")]
+        [Authorize(Roles = "LoggedUser")]
         public IActionResult MySelf()
         {
             var currentUser = _httpContextAccessor.HttpContext.User;

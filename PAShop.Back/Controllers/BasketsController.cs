@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ using Services.Interfaces;
 namespace PAShop.API.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController, EnableCors("CORS")]
     public class BasketsController : GenericController<Basket>
     {
         private readonly IGenericService<Basket> _service;
