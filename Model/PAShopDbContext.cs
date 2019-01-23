@@ -49,7 +49,17 @@ namespace Model
                 .HasForeignKey<Transaction>( t => t.OrderId);
 
             modelBuilder.Entity<Basket>()
-                .HasMany<Item>(b => b.Items);
+                .HasMany<BasketItem>(b => b.BasketItems)
+                .WithOne(bi => bi.Basket)
+                .HasForeignKey(bi => bi.BasketId);
+
+            modelBuilder.Entity<Item>()
+                .HasMany<BasketItem>(b => b.BasketItems)
+                .WithOne(bi => bi.Item)
+                .HasForeignKey(bi => bi.ItemId);
+
+            modelBuilder.Entity<BasketItem>()
+                .HasKey(bi => new { bi.BasketId, bi.ItemId});
 
             modelBuilder.Entity<Item>()
                 .HasMany<StockMovement>(i => i.StockMovements)

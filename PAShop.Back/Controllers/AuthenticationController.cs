@@ -20,7 +20,7 @@ namespace PAShop.API.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AuthenticationHelper _authenticationHelper;
 
-        public AuthenticationController(IConfiguration config, IHttpContextAccessor httpContextAccessor,IUserService userService)
+        public AuthenticationController(IConfiguration config, IHttpContextAccessor httpContextAccessor,IUserService userService) : base()
         {
             _config = config;
             _httpContextAccessor = httpContextAccessor;

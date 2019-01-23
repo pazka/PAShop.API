@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Model.Models;
@@ -14,10 +15,12 @@ namespace Services.Services
     {
         private SHA1CryptoServiceProvider Sha1;
         private new IGenericRepository<User> _repository;
+        private IGenericRepository<Basket> _basketRepository;
 
-        public UserService(IGenericRepository<User> repo) : base(repo)
+        public UserService(IGenericRepository<User> repo, IGenericRepository<Basket> basketRepository) : base(repo)
         {
             this._repository = repo;
+            _basketRepository = basketRepository;
             this.Sha1 = new SHA1CryptoServiceProvider();
         }
 
@@ -45,7 +48,21 @@ namespace Services.Services
                 return null;
             }
 
-            return this._repository.Add(user);
+            user.Deleted = false;
+            user = this._repository.Add(user);
+            if (user != null)
+            {
+                Basket basket = new Basket()
+                {
+                    Owner = user,
+                    State = State.NotValidated,
+                    BasketItems = new List<BasketItem>()
+                };
+                _basketRepository.Add(basket);
+            }
+
+
+            return user;
         }
 
         public User Authenticate(string login, string password)
@@ -70,6 +87,12 @@ namespace Services.Services
             user.Deleted = true;
 
             return _repository.Put(user);
+        }
+
+        public User Me(ClaimsPrincipal claimsPrincipal) { 
+            var email = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+
+            return this.Get(u => u.Email == email.Value).SingleOrDefault();
         }
     }
 }

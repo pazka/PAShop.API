@@ -29,6 +29,8 @@ namespace Model.Models
         public User Creator { get; set; }
         [IncludeProperty]
         public ICollection<StockMovement> StockMovements { get; set; }
+        [IncludeProperty]
+        public ICollection<BasketItem> BasketItems { get; set; }
         public ICollection<Inventory> Inventories { get; set; }
     }
 }
