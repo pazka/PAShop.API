@@ -44,10 +44,9 @@ namespace Services.Services
             return _repository.Put(obj);
         }
 
-        public T Delete(T obj)
+        public T Delete(Guid id)
         {
-
-            return _repository.Delete(obj);
+            return _repository.Delete(_repository.Get(x => x.Id == id).SingleOrDefault());
         }
 
         public bool Exists(Guid id)

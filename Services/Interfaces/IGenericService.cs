@@ -13,7 +13,7 @@ namespace Services.Interfaces
         List<T> Get(Expression<Func<T, Boolean>> predicate);
         T Get(Guid id);
         T Put(T obj);
-        T Delete(T obj);
+        T Delete(Guid id);
         bool Exists(Guid id);
     }
 }

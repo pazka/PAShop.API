@@ -74,7 +74,7 @@ namespace Services.Services
             return user;
         }
 
-        public User Delete(Guid id)
+        public new User Delete(Guid id)
         {
             User user = _repository.Get(u => u.Id == id).SingleOrDefault();
 
@@ -83,7 +83,7 @@ namespace Services.Services
                 return null;
             }
 
-            user.Deleted = true;
+            user.Deleted = !user.Deleted;
 
             return _repository.Put(user);
         }

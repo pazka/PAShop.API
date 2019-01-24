@@ -19,20 +19,22 @@ namespace PAShop.API.Controllers
     {
         private IGenericService<StockMovement> _stockMovementService;
         private IGenericService<Inventory> _inventoryService;
+        private IItemService _itemService;
 
-        public ItemsController(IGenericService<Item> service,IHttpContextAccessor httpContextAccessor, IGenericService<StockMovement> stockMovementService, IGenericService<Inventory> inventoryService) : base(service,httpContextAccessor)
+        public ItemsController(IItemService service,IHttpContextAccessor httpContextAccessor, IGenericService<StockMovement> stockMovementService, IGenericService<Inventory> inventoryService) : base(service,httpContextAccessor)
         {
+            _itemService = service;
             _inventoryService = inventoryService;
             _stockMovementService = stockMovementService;
         }
 
         [AllowAnonymous, HttpGet("tva")]
-        public Dictionary<string,TvaType> GetTva() {
+        public List<dynamic> GetTva() {
 
-            Dictionary<string,TvaType> dic = new Dictionary<string, TvaType>();
+            List<dynamic> dic = new List<dynamic>();
             foreach (TvaType curr_type in Enum.GetValues(typeof(TvaType)).Cast<TvaType>())
             {
-                dic.Add(Enum.GetName(typeof(TvaType), curr_type),curr_type);
+                dic.Add(new{name = Enum.GetName(typeof(TvaType), curr_type), value = curr_type });
             }
 
             return dic;
@@ -40,12 +42,18 @@ namespace PAShop.API.Controllers
 
         [HttpPost("{itemId}/change")]
         [Authorize("Vendor")]
-        public IActionResult ChangeQuantityDisp([FromRoute] Guid itemId,[FromBody] int amount) {
+        public IActionResult ChangeQuantityDisp([FromRoute] Guid itemId,[FromBody] dynamic body) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
-            Item item;
 
+            if (body.amount == null)
+            {
+                return BadRequest("body.amount not found");
+            }
+
+            Item item;
+            int amount = body.amount;
             try
             {
                 item = _service.Get(i => i.Id == itemId).SingleOrDefault();
@@ -72,7 +80,7 @@ namespace PAShop.API.Controllers
 
             _stockMovementService.Add(stockMovement);
 
-            return null;//TODO
+            return Ok(new{stock = _itemService.GetGlobalQuantity(itemId), item = _itemService.Get(i => i.Id == itemId)});
         }
 
         [HttpPost]

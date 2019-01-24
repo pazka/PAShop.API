@@ -77,11 +77,12 @@ namespace PAShop.API
           //  services.AddScoped<IGenericRepository<BasketItem>, GenericRepository<BasketItem>>();
 
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IGenericService<User>, GenericService<User>>();
-            services.AddScoped<IGenericService<Basket>, GenericService<Basket>>();
+            services.AddScoped<IGenericService<User>, UserService>();
+            services.AddScoped<IGenericService<Basket>, BasketService>();
             services.AddScoped<IBasketService, BasketService>();
+            services.AddScoped<IGenericService<Item>, ItemService>();
+            services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IGenericService<Inventory>, GenericService<Inventory>>();
-            services.AddScoped<IGenericService<Item>, GenericService<Item>>();
             services.AddScoped<IGenericService<StockMovement>, GenericService<StockMovement>>();
             services.AddScoped<IGenericService<Transaction>, GenericService<Transaction>>();
             //services.AddScoped<IGenericService<BasketItem>, GenericService<BasketItem>>();

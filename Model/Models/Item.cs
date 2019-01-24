@@ -25,6 +25,7 @@ namespace Model.Models
         public String ImageUrl { get; set; }
         [Required]
         public TvaType Tva { get; set; }
+        public bool Deleted { get; set; }
         
         [IncludeProperty]
         public ICollection<StockMovement> StockMovements { get; set; }

@@ -90,9 +90,32 @@ namespace PAShop.API.Controllers
                 }
             }
 
-            return CreatedAtAction("Get", new { id = obj.Id }, obj);
+            return Ok(obj);
         }
-        
+
+        // POST: api/Baskets
+        [HttpDelete("{id}")]
+        public virtual IActionResult Delete([FromBody] Guid id) {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            T obj;
+            try {
+                obj = _service.Delete(id);
+            }
+            catch (DbUpdateException) {
+                if (_service.Exists(id)) {
+                    return new StatusCodeResult(StatusCodes.Status409Conflict);
+                }
+                else {
+                    throw;
+                }
+            }
+
+            return Ok(obj);
+        }
+
         private bool Exists(Guid id) {
             return _service.Exists(id);
         }

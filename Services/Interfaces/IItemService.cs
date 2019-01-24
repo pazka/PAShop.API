@@ -7,6 +7,6 @@ namespace Services.Interfaces
 {
     public interface IItemService : IGenericService<Item>
     {
-        IDictionary<StockMovementType,int> GetTotalQuantity(Guid Item);
+        Dictionary<StockMovementType,int> GetGlobalQuantity(Guid Item);
     }
 }
