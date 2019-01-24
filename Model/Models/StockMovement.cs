@@ -17,7 +17,7 @@ namespace Model.Models
         public DateTime Timestamp { get; set; }
         [Required]
         [DefaultValue(StockMovementType.Regular)]
-        public static StockMovementType Type { get; set; }
+        public StockMovementType Type { get; set; }
 
         [Required]
         [IncludeProperty]

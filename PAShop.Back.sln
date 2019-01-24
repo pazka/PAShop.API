@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Tests", "Services.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PAShop.API", "PAShop.Back\PAShop.API.csproj", "{25B9A8B3-172A-4536-8743-747093C66EBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCustomAnnotations", "EFCustomAnnotations\EFCustomAnnotations.csproj", "{696B3934-D892-4882-9F37-9CCAC0DA590D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCustomAnnotations", "EFCustomAnnotations\EFCustomAnnotations.csproj", "{696B3934-D892-4882-9F37-9CCAC0DA590D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

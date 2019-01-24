@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Model.Models;
+using MoreLinq;
 using Services.Interfaces;
 
 namespace PAShop.API.Controllers
@@ -16,31 +17,44 @@ namespace PAShop.API.Controllers
     [ApiController, EnableCors("CORS")]
     public class ItemsController : GenericController<Item>
     {
-        private IGenericService<StockMovement> _serviceStockMovement;
-        public ItemsController(IGenericService<Item> service,IHttpContextAccessor httpContextAccessor, IGenericService<StockMovement> serviceStockMovement) : base(service,httpContextAccessor)
+        private IGenericService<StockMovement> _stockMovementService;
+        private IGenericService<Inventory> _inventoryService;
+
+        public ItemsController(IGenericService<Item> service,IHttpContextAccessor httpContextAccessor, IGenericService<StockMovement> stockMovementService, IGenericService<Inventory> inventoryService) : base(service,httpContextAccessor)
         {
-            _serviceStockMovement = serviceStockMovement;
+            _inventoryService = inventoryService;
+            _stockMovementService = stockMovementService;
         }
 
-        [HttpPost("{id}")]
+        [AllowAnonymous, HttpGet("tva")]
+        public Dictionary<string,TvaType> GetTva() {
+
+            Dictionary<string,TvaType> dic = new Dictionary<string, TvaType>();
+            foreach (TvaType curr_type in Enum.GetValues(typeof(TvaType)).Cast<TvaType>())
+            {
+                dic.Add(Enum.GetName(typeof(TvaType), curr_type),curr_type);
+            }
+
+            return dic;
+        }
+
+        [HttpPost("{itemId}/change")]
         [Authorize("Vendor")]
-        public IActionResult ChangeQuantityDisp([FromRoute] Guid id, [FromBody] StockMovement stockMovement) {
+        public IActionResult ChangeQuantityDisp([FromRoute] Guid itemId,[FromBody] int amount) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
-            
-
             Item item;
 
             try
             {
-                item = _service.Get(i => i.Id == stockMovement.Item.Id).SingleOrDefault();
+                item = _service.Get(i => i.Id == itemId).SingleOrDefault();
             }
             catch (DbUpdateException)
             {
-                if (_service.Exists(stockMovement.Item.Id))
+                if (_service.Exists(itemId))
                 {
-                    return NotFound();
+                    return BadRequest("Item not found.");
                 }
                 else
                 {
@@ -48,16 +62,41 @@ namespace PAShop.API.Controllers
                 }
             }
 
-            stockMovement.Item = item;
+            StockMovement stockMovement = new StockMovement()
+            {
+                Amount = amount,
+                LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
+                Item = item,
+                Timestamp = DateTime.Now
+            };
 
-            return Ok(_serviceStockMovement.Get(sm => sm.Item.Id == id));
+            _stockMovementService.Add(stockMovement);
+
+            return null;//TODO
         }
 
         [HttpPost]
         [Authorize("Vendor")]
         public override IActionResult New(Item item)
         {
-            return base.New(item);
+            item = _service.Add(item);
+
+            Inventory inventory = _inventoryService.Add(new Inventory()
+            {
+                Item = item,
+                Quantity = 0,
+                Timestamp = DateTime.Now
+            });
+
+            _stockMovementService.Add(new StockMovement()
+            {
+                Amount = 0,
+                Item = item,
+                LastInventory = inventory,
+                Timestamp = DateTime.Now
+            });
+
+            return Ok(_service.Get(i=> i.Id == item.Id));
         }
 
         [HttpGet("search")]

@@ -10,6 +10,7 @@ namespace Model.Models
         public int Quantity { get; set; }
 
         public Item Item { get; set; }
+        public DateTime Timestamp { get; set; }
         public ICollection<StockMovement> StockMovements { get; set; }
     }
 }

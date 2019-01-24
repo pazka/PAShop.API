@@ -15,6 +15,8 @@ using Services.Interfaces;
 
 namespace PAShop.API.Controllers
 {
+    //TODO TEst sur basket car classe contenant le plus de logique
+    //TODO réorganiser le code car trop de logique métier dans le controlleur
     [Route("api/[controller]")]
     [ApiController, EnableCors("CORS")]
     public class BasketsController : GenericController<Basket>

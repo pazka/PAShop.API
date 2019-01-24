@@ -26,11 +26,11 @@ namespace Model.Models
         [Required]
         public TvaType Tva { get; set; }
         
-        public User Creator { get; set; }
         [IncludeProperty]
         public ICollection<StockMovement> StockMovements { get; set; }
         [IncludeProperty]
         public ICollection<BasketItem> BasketItems { get; set; }
+        [IncludeProperty]
         public ICollection<Inventory> Inventories { get; set; }
     }
 }
