@@ -40,5 +40,13 @@ namespace PAShop.API.Controllers
             _service.Add(inventory);
             return Ok(inventory);
         }
+
+
+
+        [HttpGet("item/{itemId}")]
+        [Authorize("Vendor")]
+        public IActionResult GetStock(Guid itemId) {
+            return Ok(_itemService.GetGlobalQuantity(itemId));
+        }
     }
 }
