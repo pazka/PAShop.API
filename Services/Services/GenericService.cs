@@ -18,9 +18,12 @@ namespace Services.Services
             this._repository = repo;
         }
 
-        public List<T> GetAll()
-        {
+        public List<T> GetAll() {
             return _repository.GetAll();
+        }
+
+        public List<T> GetAll(Expression<Func<T, Boolean>> predicate) {
+            return _repository.Get(predicate);
         }
 
         public T Get(Guid id)

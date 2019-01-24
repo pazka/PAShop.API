@@ -67,18 +67,11 @@ namespace PAShop.API.Controllers
             int amount = body.amount;
             try
             {
-                item = _service.Get(i => i.Id == itemId).SingleOrDefault();
+                item = _service.GetAll(i => i.Id == itemId).SingleOrDefault();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException e)
             {
-                if (_service.Exists(itemId))
-                {
-                    return BadRequest("Item not found.");
-                }
-                else
-                {
-                    throw;
-                }
+                    return Ok(new {text ="Item not found." + e.ToString()});
             }
 
             StockMovement stockMovement = new StockMovement()
@@ -92,7 +85,7 @@ namespace PAShop.API.Controllers
 
             _stockMovementService.Add(stockMovement);
 
-            return Ok(new{stock = _itemService.GetGlobalQuantity(itemId), item = _itemService.Get(i => i.Id == itemId)});
+            return Ok(new{stock = _itemService.GetGlobalQuantity(itemId), item = _itemService.GetAll(i => i.Id == itemId)});
         }
 
         [HttpPost]
@@ -116,7 +109,7 @@ namespace PAShop.API.Controllers
                 Timestamp = DateTime.Now
             });
 
-            return Ok(_service.Get(i=> i.Id == item.Id));
+            return Ok(_service.GetAll(i=> i.Id == item.Id));
         }
 
         [HttpGet("search")]

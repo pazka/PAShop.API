@@ -45,7 +45,7 @@ namespace Services.Services
 
             return res;
         }
-        
+
         public new List<Item> Get(Expression<Func<Item, bool>> predicate)
         {
             return _repository.Get(predicate).Where(i => i.Deleted == false).ToList();

@@ -46,7 +46,7 @@ namespace PAShop.API.Controllers
         {
             return _service.GetAll();
         }
-
+        
         [HttpGet("mine")]
         [Authorize("User")]
         public IActionResult GetMyBasket()
@@ -78,20 +78,15 @@ namespace PAShop.API.Controllers
             Item item;
 
             try {
-               item = _itemService.Get(itemId);
+               item = _itemService.GetAll(i=>i.Id == itemId).SingleOrDefault();
                Dictionary<StockMovementType, int> stocks = _itemService.GetGlobalQuantity(itemId);
                if (stocks.GetValueOrDefault(StockMovementType.Regular) <= 0)
                {
-                   return Ok($"No stock left ( {stocks.GetValueOrDefault(StockMovementType.Reserved)} reserved).");
+                   return Ok(new { text = $"No stock left ( {stocks.GetValueOrDefault(StockMovementType.Reserved)} reserved)."});
                }
             }
             catch (DbUpdateException e) {
-                if (_itemService.Exists(itemId)) {
-                    return Ok("Item not found");
-                }
-                else {
-                    throw;
-                }
+                   return Ok(new { text = "Item not found"});
             }
 
             Basket basket = _service.Mine(_httpContextAccessor.HttpContext.User);
