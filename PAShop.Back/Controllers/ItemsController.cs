@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +22,13 @@ namespace PAShop.API.Controllers
             _serviceStockMovement = serviceStockMovement;
         }
 
-
         [HttpPost("{id}")]
-        public IActionResult ChangeQuantityDisp([FromRoute] Guid id, StockMovement stockMovement) {
+        [Authorize(Roles = "Vendor")]
+        public IActionResult ChangeQuantityDisp([FromRoute] Guid id, [FromBody] StockMovement stockMovement) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
+            
 
             Item item;
 
@@ -51,15 +53,23 @@ namespace PAShop.API.Controllers
             return Ok(_serviceStockMovement.Get(sm => sm.Item.Id == id));
         }
 
+        [HttpPost]
+       // [Authorize(Roles = "Vendor")]
+        public override IActionResult New(Item item)
+        {
+            return base.New(item);
+        }
+
         [HttpGet("search")]
+        [AllowAnonymous]
         public IActionResult Search([FromQuery] string tags)
         {
             string[] tags_arr = tags.Split();
 
             //laids mais pas le choix 
-            List < Item > allItems = _service.GetAll();
+            List<Item> allItems = _service.GetAll();
 
-            return Ok(allItems.Where(i=> i.Label.Split().Intersect(tags_arr).Any()));
+            return Ok(allItems.Where(i => i.Label.Split().Intersect(tags_arr).Any()));
         }
     }
 }

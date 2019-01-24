@@ -134,7 +134,7 @@ namespace PAShop.API
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("User", policy => policy.RequireRole(LoggedUser.ToString()));
-                options.AddPolicy("Vendor", policy => policy.RequireRole(Admin.ToString()));
+                options.AddPolicy("Vendor", policy => policy.RequireRole(Vendor.ToString()));
                 options.AddPolicy("Admin", policy => policy.RequireRole(Admin.ToString()));
             });
         }

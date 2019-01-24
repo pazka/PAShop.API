@@ -6,12 +6,12 @@ using EFCustomAnnotations;
 
 namespace Model.Models
 {
-    public enum State { NotValidated, Validated, Payed, Shipped, Received}
+    public enum BasketState { NotValidated, Validated, Payed, Shipped, Received}
     public class Basket : IGenericModel
     {
         public Guid Id { get; set; }
         
-        public State State { get; set; }
+        public BasketState State { get; set; }
 
         [IncludeProperty]
         public User Owner { get; set; }

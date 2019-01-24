@@ -55,12 +55,11 @@ namespace Services.Services
                 Basket basket = new Basket()
                 {
                     Owner = user,
-                    State = State.NotValidated,
+                    State = BasketState.NotValidated,
                     BasketItems = new List<BasketItem>()
                 };
                 _basketRepository.Add(basket);
             }
-
 
             return user;
         }

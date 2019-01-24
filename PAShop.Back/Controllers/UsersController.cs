@@ -30,7 +30,8 @@ namespace PAShop.API.Controllers
         }
 
         // POST api/<controller>
-        [HttpPost()]
+        [HttpPost]
+        [AllowAnonymous]
         public ActionResult<User> New([FromBody]User user)
         {
             
@@ -46,6 +47,7 @@ namespace PAShop.API.Controllers
 
         // GET api/<controller>/all
         [HttpGet("")]
+        [AllowAnonymous]
         public ActionResult<IEnumerable<User>> All()
         {
             return _userService.GetAll();
@@ -54,7 +56,7 @@ namespace PAShop.API.Controllers
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<User> Get(Guid id)
         {
             List<User> userList = _userService.Get(u => u.Id == id);
@@ -69,18 +71,32 @@ namespace PAShop.API.Controllers
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "User")]
-        public ActionResult<User> Put([FromRoute]Guid id, [FromBody]User user)
-        {
+        [Authorize(Roles = "Admin")]
+        public ActionResult<User> Put([FromRoute]Guid id, [FromBody]User user) {
 
-            if (!ModelState.IsValid)
-            {
+            if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
 
-            if (id != user.Id)
-            {
+            if (id != user.Id) {
                 return BadRequest();
+            }
+
+
+            return _userService.Put(user);
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "LoggedUser")]
+        public ActionResult<User> Put([FromBody]User user) {
+
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            User me = _userService.Me(HttpContext.User);
+            if (me.Id != user.Id) {
+                return BadRequest("User not you");
             }
 
 
@@ -89,7 +105,7 @@ namespace PAShop.API.Controllers
 
         // DELETE api/<controller>/5
         [HttpDelete("")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "LoggedUser")]
         public ActionResult DeleteSelf()
         {
             User user = _userService.Get(u => u.Email == HttpContext.User.FindFirst(ClaimTypes.Email).Value).SingleOrDefault();
@@ -100,7 +116,7 @@ namespace PAShop.API.Controllers
             }
 
             if (user == null)
-                return NotFound();
+                return BadRequest("User not found");
 
             if (_userService.Delete(user.Id) == null)
                 return StatusCode(500, "User could not be deleted");
@@ -121,7 +137,7 @@ namespace PAShop.API.Controllers
             }
 
             if ((user = _userService.Delete(id)) == null)
-                return NotFound();
+                return BadRequest("User not found");
 
             return Ok(user);
         }

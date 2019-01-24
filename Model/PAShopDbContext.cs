@@ -41,10 +41,11 @@ namespace Model
 
             modelBuilder.Entity<User>()
                 .HasMany<Transaction>(u => u.Payments)
-                .WithOne(t => t.User);
+                .WithOne(t => t.Owner)
+                .HasForeignKey(t => t.OwnerId);
 
             modelBuilder.Entity<Basket>()
-                .HasOne(b => b.Transaction)
+                .HasOne<Transaction>(b => b.Transaction)
                 .WithOne(t => t.Order)
                 .HasForeignKey<Transaction>( t => t.OrderId);
 

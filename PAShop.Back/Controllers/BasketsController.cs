@@ -22,9 +22,11 @@ namespace PAShop.API.Controllers
         private new readonly IBasketService _service;
         private readonly IGenericService<Item> _itemService;
         private readonly IUserService _userService;
+        private readonly IGenericService<Transaction> _transactionService;
 
-        public BasketsController(IBasketService service, IHttpContextAccessor httpContextAccessor, IUserService userService, IGenericService<Item> itemService) : base(service,httpContextAccessor)
+        public BasketsController(IBasketService service, IHttpContextAccessor httpContextAccessor, IUserService userService, IGenericService<Item> itemService,IGenericService<Transaction> transactionService) : base(service,httpContextAccessor)
         {
+            _transactionService = transactionService;
             _service = service;
             _userService = userService;
             _itemService = itemService;
@@ -39,7 +41,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpGet("mine")]
-        [Authorize(Roles = "LoggedUser")]
+        [Authorize("User")]
         public IActionResult GetMyBasket()
         {
             Basket basket;
@@ -48,7 +50,7 @@ namespace PAShop.API.Controllers
             }
             catch (Exception e)
             {
-                return NotFound();
+                return StatusCode(500,e.ToString());
             }
 
             return Ok(basket);
@@ -71,9 +73,9 @@ namespace PAShop.API.Controllers
             try {
                item = _itemService.Get(itemId);
             }
-            catch (DbUpdateException) {
+            catch (DbUpdateException e) {
                 if (_itemService.Exists(itemId)) {
-                    return NotFound();
+                    return BadRequest("Item not found");
                 }
                 else {
                     throw;
@@ -119,7 +121,7 @@ namespace PAShop.API.Controllers
             }
             catch (Exception)
             {
-                return NotFound("Item not in basket.");
+                return BadRequest("Item not in basket.");
             }
 
             if (basketItem == null) {
@@ -135,6 +137,45 @@ namespace PAShop.API.Controllers
             _service.Put(basket);
 
             return Ok(_service.Mine(_httpContextAccessor.HttpContext.User));
+        }
+
+        [HttpPost("validate/{basketId}")]
+        [Authorize(Roles = "LoggedUser")]
+        public IActionResult ValidateBasket(Guid basketId)
+        {
+
+            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
+            Basket basket = _service.Get(b => b.Id == basketId && b.State == BasketState.NotValidated).SingleOrDefault();
+
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            if (basket == null)
+            {
+                return BadRequest("Basket not found");
+            }
+            else if (basket.Owner.Id != user.Id && user.Role < Role.Admin)
+            {
+                return StatusCode(403,"Not your basket and not an Admin.");
+            }
+
+            Transaction transaction = new Transaction()
+            {
+                Order = basket,
+                OrderId = basketId,
+                Owner = user,
+                OwnerId = user.Id,
+                State = TransactionState.Payed
+            };
+
+            basket.Transaction = transaction;
+            basket.State = BasketState.Payed;
+
+            _transactionService.Add(transaction);
+            _service.Put(basket);
+
+            return Ok(_service.Mine(HttpContext.User));
         }
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Model.Models
 {
-    public enum Role{Admin = 0,LoggedUser = 1,Vendor = 2}
+    public enum Role{Admin = 2,LoggedUser = 0,Vendor = 1}
 
     public class User : IGenericModel
     {

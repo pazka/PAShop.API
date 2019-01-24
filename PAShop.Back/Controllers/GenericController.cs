@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,13 +29,13 @@ namespace PAShop.API.Controllers
 
         // GET: api/Baskets
         [HttpGet]
-        public IEnumerable<T> GetAll() { 
+        public virtual IEnumerable<T> GetAll() { 
             return _service.GetAll();
         }
 
         // GET: api/Baskets/5
         [HttpGet("{id}")]
-        public IActionResult Get([FromRoute] Guid id) {
+        public virtual IActionResult Get([FromRoute] Guid id) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -41,7 +43,7 @@ namespace PAShop.API.Controllers
             var obj = _service.Get(b => b.Id == id).SingleOrDefault();
 
             if (obj == null) {
-                return NotFound();
+                return BadRequest("NotFound");
             }
 
             return Ok(obj);
@@ -49,13 +51,13 @@ namespace PAShop.API.Controllers
 
         // PUT: api/Baskets/5
         [HttpPut("{id}")]
-        public IActionResult Put([FromRoute] Guid id, [FromBody] T obj) {
+        public virtual IActionResult Put([FromRoute] Guid id, [FromBody] T obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
 
             if (id != obj.Id) {
-                return BadRequest();
+                return BadRequest("obj.id is not id");
             }
 
             try {
@@ -63,7 +65,7 @@ namespace PAShop.API.Controllers
             }
             catch (DbUpdateConcurrencyException) {
                 if (!_service.Exists(id)) {
-                    return NotFound();
+                    return BadRequest("NotFound");
                 }
                 throw;
             }
@@ -71,7 +73,7 @@ namespace PAShop.API.Controllers
 
         // POST: api/Baskets
         [HttpPost]
-        public IActionResult New([FromBody] T obj) {
+        public virtual IActionResult New([FromBody] T obj) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
