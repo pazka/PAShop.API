@@ -17,9 +17,9 @@ namespace PAShop.API.Controllers
     [ApiController, EnableCors("CORS")]
     public class ItemsController : GenericController<Item>
     {
-        private IGenericService<StockMovement> _stockMovementService;
-        private IGenericService<Inventory> _inventoryService;
-        private IItemService _itemService;
+        private readonly IGenericService<StockMovement> _stockMovementService;
+        private readonly IGenericService<Inventory> _inventoryService;
+        private readonly IItemService _itemService;
 
         public ItemsController(IItemService service,IHttpContextAccessor httpContextAccessor, IGenericService<StockMovement> stockMovementService, IGenericService<Inventory> inventoryService) : base(service,httpContextAccessor)
         {
@@ -47,9 +47,11 @@ namespace PAShop.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (body.amount == null)
-            {
+            if (body.amount == null) {
                 return BadRequest("body.amount not found");
+            }
+            if (body.type == null) {
+                return BadRequest("body.type not found");
             }
 
             Item item;
@@ -75,7 +77,8 @@ namespace PAShop.API.Controllers
                 Amount = amount,
                 LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
                 Item = item,
-                Timestamp = DateTime.Now
+                Timestamp = DateTime.Now,
+                Type = body.type
             };
 
             _stockMovementService.Add(stockMovement);
