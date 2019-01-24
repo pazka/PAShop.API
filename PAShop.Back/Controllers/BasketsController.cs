@@ -34,7 +34,7 @@ namespace PAShop.API.Controllers
 
         // GET: api/Baskets
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize("Admin")]
         public IEnumerable<Basket> GetBaskets()
         {
             return _service.GetAll();
@@ -58,7 +58,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpPost("add/{itemId}")]
-        [Authorize(Roles = "LoggedUser")]
+        [Authorize("User")]
         public IActionResult AddItem(Guid itemId)
         {
             User user = _userService.Me(_httpContextAccessor.HttpContext.User);
@@ -104,7 +104,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpPost("remove/{itemId}")]
-        [Authorize(Roles = "LoggedUser")]
+        [Authorize("User")]
         public IActionResult RemoveItem(Guid itemId) {
             User user = _userService.Me(_httpContextAccessor.HttpContext.User);
 
@@ -140,7 +140,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpPost("validate/{basketId}")]
-        [Authorize(Roles = "LoggedUser")]
+        [Authorize("User")]
         public IActionResult ValidateBasket(Guid basketId)
         {
 

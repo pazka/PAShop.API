@@ -30,20 +30,22 @@ namespace PAShop.API.Controllers
         [AllowAnonymous, HttpPost("login")]
         public IActionResult CreateToken([FromBody] dynamic login)
         {
-            IActionResult response = Unauthorized();
-
+            if (login["Email"] == null || login["Password"] == null)
+            {
+                return BadRequest("Missing Email or Password");
+            }
             var user = _authenticationHelper.Authenticate(login);
 
-            if (user == null) return response;
+            if (user == null) return StatusCode(403,"Bad Credentials");
 
             var tokenString = _authenticationHelper.BuildToken(user);
-            response = Ok(new { token = tokenString });
-            return response;
+
+            return Ok(new { user = user, token = tokenString });
 
         }
 
         [HttpGet("me")]
-        [Authorize(Roles = "LoggedUser")]
+        [Authorize("User")]
         public IActionResult MySelf()
         {
             var currentUser = _httpContextAccessor.HttpContext.User;

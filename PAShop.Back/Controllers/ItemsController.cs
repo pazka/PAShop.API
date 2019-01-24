@@ -23,7 +23,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpPost("{id}")]
-        [Authorize(Roles = "Vendor")]
+        [Authorize("Vendor")]
         public IActionResult ChangeQuantityDisp([FromRoute] Guid id, [FromBody] StockMovement stockMovement) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -54,7 +54,7 @@ namespace PAShop.API.Controllers
         }
 
         [HttpPost]
-       // [Authorize(Roles = "Vendor")]
+        [Authorize("Vendor")]
         public override IActionResult New(Item item)
         {
             return base.New(item);

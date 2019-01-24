@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -133,9 +134,22 @@ namespace PAShop.API
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("User", policy => policy.RequireRole(LoggedUser.ToString()));
-                options.AddPolicy("Vendor", policy => policy.RequireRole(Vendor.ToString()));
-                options.AddPolicy("Admin", policy => policy.RequireRole(Admin.ToString()));
+                options.AddPolicy("User", policy => policy.RequireAssertion(ctx =>
+                {
+                    return ctx.User.HasClaim(ClaimTypes.Role, Role.LoggedUser.ToString()) ||
+                           ctx.User.HasClaim(ClaimTypes.Role, Role.Vendor.ToString()) ||
+                           ctx.User.HasClaim(ClaimTypes.Role, Role.Admin.ToString());
+                }));
+
+                options.AddPolicy("Vendor", policy => policy.RequireAssertion(ctx =>
+                {
+                    return ctx.User.HasClaim(ClaimTypes.Role, Role.Vendor.ToString()) ||
+                           ctx.User.HasClaim(ClaimTypes.Role, Role.Admin.ToString());
+                }));
+                options.AddPolicy("Admin", policy => policy.RequireAssertion(ctx =>
+                {
+                    return ctx.User.HasClaim(ClaimTypes.Role, Role.Admin.ToString());
+                }));
             });
         }
     }
