@@ -46,14 +46,29 @@ namespace PAShop.API.Controllers
         {
             return _service.GetAll();
         }
-        
+
         [HttpGet("mine")]
         [Authorize("User")]
-        public IActionResult GetMyBasket()
-        {
+        public IActionResult GetMyBasket() {
             Basket basket;
             try {
                 basket = _service.Mine(_httpContextAccessor.HttpContext.User);
+            }
+            catch (Exception e) {
+                return StatusCode(500, e.ToString());
+            }
+
+            return Ok(basket);
+
+        }
+        
+        [HttpGet("allMine")]
+        [Authorize("User")]
+        public IActionResult GetMyBaskets() {
+            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
+            List < Basket> basket;
+            try {
+                basket = _service.Get(b=>b.Owner.Id == user.Id);
             }
             catch (Exception e)
             {
@@ -64,11 +79,11 @@ namespace PAShop.API.Controllers
 
         }
 
+
         [HttpPost("add/{itemId}")]
         [Authorize("User")]
         public IActionResult AddItem(Guid itemId)
         {
-            User user = _userService.Me(_httpContextAccessor.HttpContext.User);
 
             if (!ModelState.IsValid)
             {
@@ -230,6 +245,11 @@ namespace PAShop.API.Controllers
 
             _transactionService.Add(transaction);
             _service.Put(basket);
+            _service.Add(new Basket()
+            {
+                State = BasketState.NotValidated,
+                Owner = user
+            });
 
             return Ok(_service.Mine(HttpContext.User));
         }

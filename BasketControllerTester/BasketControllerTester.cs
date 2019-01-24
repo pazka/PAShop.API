@@ -5,8 +5,5 @@ namespace BasketControllerTester
     [TestClass]
     public class BasketControllerTester
     {
-        [TestMethod]
-        public void () {
-        }
     }
 }
