@@ -40,6 +40,12 @@ namespace PAShop.API.Controllers
             return dic;
         }
 
+        [AllowAnonymous, HttpGet("hot")]
+        public ActionResult GetHotProduct()
+        {
+            return Ok(_itemService.GetAll().Where(i => i.Deleted == false).OrderBy(i => i.Priority).Take(3));
+        }
+
         [HttpPost("{itemId}/change")]
         [Authorize("Vendor")]
         public IActionResult ChangeQuantityDisp([FromRoute] Guid itemId,[FromBody] dynamic body) {

@@ -33,7 +33,7 @@ namespace PAShop.API.Controllers
             {
                 Item = _itemService.Get(i=>i.Id== itemId).SingleOrDefault(),
                 //Arbitraire
-                Quantity = globalStock.GetValueOrDefault(StockMovementType.Regular) + globalStock.GetValueOrDefault(StockMovementType.Reserved),
+                Quantity = globalStock.GetValueOrDefault(StockMovementType.Regular) - globalStock.GetValueOrDefault(StockMovementType.Stolen),
                 Timestamp = DateTime.Now
             };
 

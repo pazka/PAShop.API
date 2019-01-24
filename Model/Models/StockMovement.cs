@@ -22,7 +22,6 @@ namespace Model.Models
         [Required]
         [IncludeProperty]
         public Item Item { get; set; }
-        [IncludeProperty]
         public Inventory LastInventory { get; set; }
     }
 }

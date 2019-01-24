@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Model;
+using Model.Migrations;
 using Model.Models;
+using MoreLinq;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
@@ -22,12 +24,15 @@ namespace PAShop.API.Controllers
     public class BasketsController : GenericController<Basket>
     {
         private new readonly IBasketService _service;
-        private readonly IGenericService<Item> _itemService;
+        private readonly IGenericService<StockMovement> _stockMovementService;
+        private readonly IGenericService<Inventory> _inventoryService;
+        private readonly IItemService _itemService;
         private readonly IUserService _userService;
         private readonly IGenericService<Transaction> _transactionService;
 
-        public BasketsController(IBasketService service, IHttpContextAccessor httpContextAccessor, IUserService userService, IGenericService<Item> itemService,IGenericService<Transaction> transactionService) : base(service,httpContextAccessor)
-        {
+        public BasketsController(IBasketService service, IHttpContextAccessor httpContextAccessor, IUserService userService, IItemService itemService,IGenericService<Transaction> transactionService, IGenericService<StockMovement> stockMovementService, IGenericService<Inventory> inventoryService) : base(service,httpContextAccessor) {
+            _stockMovementService = stockMovementService;
+            _inventoryService = inventoryService;
             _transactionService = transactionService;
             _service = service;
             _userService = userService;
@@ -74,10 +79,15 @@ namespace PAShop.API.Controllers
 
             try {
                item = _itemService.Get(itemId);
+               Dictionary<StockMovementType, int> stocks = _itemService.GetGlobalQuantity(itemId);
+               if (stocks.GetValueOrDefault(StockMovementType.Regular) <= 0)
+               {
+                   return Ok($"No stock left ( {stocks.GetValueOrDefault(StockMovementType.Reserved)} reserved).");
+               }
             }
             catch (DbUpdateException e) {
                 if (_itemService.Exists(itemId)) {
-                    return BadRequest("Item not found");
+                    return Ok("Item not found");
                 }
                 else {
                     throw;
@@ -99,6 +109,24 @@ namespace PAShop.API.Controllers
                     Quantity = 1
                 });
             }
+
+            _stockMovementService.Add(new StockMovement()
+            {
+                Amount = 1,
+                LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
+                Item = item,
+                Timestamp = DateTime.Now,
+                Type = StockMovementType.Reserved
+            });
+
+            _stockMovementService.Add(new StockMovement()
+            {
+                Amount = -1,
+                LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
+                Item = item,
+                Timestamp = DateTime.Now,
+                Type = StockMovementType.Regular
+            });
 
             _service.Put(basket);
 
@@ -131,9 +159,27 @@ namespace PAShop.API.Controllers
             }
 
             basket.BasketItems.Remove(basketItem);
-                basketItem.Quantity--;
+            basketItem.Quantity--;
 
-            if(basketItem.Quantity >  0)
+            _stockMovementService.Add(new StockMovement()
+            {
+                Amount = -1,
+                LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
+                Item = basketItem.Item,
+                Timestamp = DateTime.Now,
+                Type = StockMovementType.Reserved
+            });
+
+            _stockMovementService.Add(new StockMovement()
+            {
+                Amount = 1,
+                LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
+                Item = basketItem.Item,
+                Timestamp = DateTime.Now,
+                Type = StockMovementType.Regular
+            });
+
+            if (basketItem.Quantity > 0) 
                 basket.BasketItems.Add(basketItem);
                 
             _service.Put(basket);
@@ -170,6 +216,19 @@ namespace PAShop.API.Controllers
                 OwnerId = user.Id,
                 State = TransactionState.Payed
             };
+
+            foreach (BasketItem bi in basket.BasketItems)
+            {
+                _stockMovementService.Add(new StockMovement()
+                {
+                    Amount = - bi.Quantity,
+                    LastInventory = _inventoryService.Get(i => i.Item.Id == bi.ItemId).MaxBy(i => i.Timestamp).SingleOrDefault(),
+                    
+                    Item = bi.Item,
+                    Timestamp = DateTime.Now,
+                    Type = StockMovementType.Reserved
+                });
+            }
 
             basket.Transaction = transaction;
             basket.State = BasketState.Payed;

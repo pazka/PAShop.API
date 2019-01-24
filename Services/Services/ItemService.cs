@@ -26,14 +26,15 @@ namespace Services.Services
         {
             Dictionary<StockMovementType,int> res = new Dictionary<StockMovementType, int>();
 
-            Inventory LastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp)
+            Inventory lastInventory = _inventoryService.Get(i => i.Item.Id == itemId).MaxBy(i => i.Timestamp)
                 .SingleOrDefault();
-            List<StockMovement> movements = _stockMovementService.Get(sm => sm.LastInventory.Id == LastInventory.Id);
+            List<StockMovement> movements = _stockMovementService.Get(sm => sm.LastInventory.Id == lastInventory.Id);
 
             int tmp;
             foreach (StockMovementType curr_type in Enum.GetValues(typeof(StockMovementType)).Cast<StockMovementType>())
             {
-                tmp = 0;
+                tmp = curr_type == StockMovementType.Regular? lastInventory.Quantity:0;
+
                 foreach (var stockMovementForType in movements.Where(m=>m.Type == curr_type))
                 {
                     tmp += stockMovementForType.Amount;

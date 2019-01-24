@@ -27,11 +27,8 @@ namespace Model.Models
         public TvaType Tva { get; set; }
         public bool Deleted { get; set; }
         
-        [IncludeProperty]
         public ICollection<StockMovement> StockMovements { get; set; }
-        [IncludeProperty]
         public ICollection<BasketItem> BasketItems { get; set; }
-        [IncludeProperty]
         public ICollection<Inventory> Inventories { get; set; }
     }
 }
