@@ -41,9 +41,12 @@ namespace PAShop.API.Controllers
         }
 
         [AllowAnonymous, HttpGet("hot")]
-        public ActionResult GetHotProduct()
-        {
+        public ActionResult GetHotProduct() {
             return Ok(_itemService.GetAll().Where(i => i.Deleted == false).OrderBy(i => i.Priority).Take(3));
+        }
+        [AllowAnonymous, HttpGet("active")]
+        public ActionResult GetActiveProduct() {
+            return Ok(_itemService.GetAll().Where(i => i.Deleted == false));
         }
 
         [HttpPost("{itemId}/change")]
