@@ -39,7 +39,7 @@ namespace PAShop.API.Controllers
 
             if (newUser == null)
             {
-                return new BadRequestObjectResult($"User with email : {user.Email} already exist");
+                return new BadRequestObjectResult(new {text = $"User with email : {user.Email} already exist"});
             }
 
             return Ok(user);
@@ -62,23 +62,23 @@ namespace PAShop.API.Controllers
             List<User> userList = _userService.Get(u => u.Id == id);
 
             if (!userList.Any())
-                return NotFound("No user at this id");
+                return BadRequest( new { text = "No user at this id"});
             if (userList.Count > 1)
-                return NotFound("Several users at this Id");
+                return NotFound(new { text = "Several users at this Id"});
 
             return userList.Single();
         }
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         public ActionResult<User> Put([FromRoute]Guid id, [FromBody]User user) {
 
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
 
-            if (id != user.Id) {
+            if (id != user.Id && _userService.Me(HttpContext).Role != Role.Admin) {
                 return BadRequest();
             }
 

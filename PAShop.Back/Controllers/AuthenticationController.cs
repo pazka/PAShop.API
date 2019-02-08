@@ -28,13 +28,15 @@ namespace PAShop.API.Controllers
         }
 
         [AllowAnonymous, HttpPost("login")]
-        public IActionResult CreateToken([FromBody] dynamic login)
+        public IActionResult Login([FromBody] dynamic login)
         {
             if (login["Email"] == null || login["Password"] == null)
             {
                 return BadRequest("Missing Email or Password");
             }
             var user = _authenticationHelper.Authenticate(login);
+
+            HttpContext.Session.Set("User",user);
 
             if (user == null) return StatusCode(403,"Bad Credentials");
 

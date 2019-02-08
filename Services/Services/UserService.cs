@@ -5,7 +5,9 @@ using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Model.Models;
+using Newtonsoft.Json;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
@@ -43,6 +45,9 @@ namespace Services.Services
             user.Password = this.Hash(user.Password);
             Sha1.Clear();
 
+            if (user.Email == null || user.Password == null)
+                return null;
+
             if (_repository.Get(u => u.Email == user.Email).Count > 0)
             {
                 return null;
@@ -50,17 +55,17 @@ namespace Services.Services
 
             user.Deleted = false;
             user = this._repository.Add(user);
-            if (user != null)
-            {
-                Basket basket = new Basket()
-                {
-                    Owner = user,
-                    State = BasketState.NotValidated,
-                    BasketItems = new List<BasketItem>()
-                };
-                _basketRepository.Add(basket);
-            }
+            if (user == null)
+                return null;
 
+            Basket basket = new Basket()
+            {
+                Owner = user,
+                State = BasketState.NotValidated,
+                BasketItems = new List<BasketItem>()
+            };
+            _basketRepository.Add(basket);
+            
             return user;
         }
 
@@ -68,9 +73,7 @@ namespace Services.Services
         {
             User user = _repository
                 .Get(u =>  u.Email == login  && u.Password.Equals(this.Hash(password))).FirstOrDefault();
-
-            //authenticate
-
+            
             return user;
         }
 
@@ -88,10 +91,20 @@ namespace Services.Services
             return _repository.Put(user);
         }
 
-        public User Me(ClaimsPrincipal claimsPrincipal) { 
-            var email = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+        public User Me(HttpContext context) {
+
+            var email = context.User.FindFirst(ClaimTypes.NameIdentifier);
 
             return this.Get(u => u.Email == email.Value).SingleOrDefault();
+            //Laid mais en utile en attendant la session 
+
+            /* byte[] user_byte;
+            User user = new User();
+
+            context.Session.TryGetValue("User",out user_byte);
+            user = JsonConvert.DeserializeObject<User>(Encoding.UTF8.GetString(user_byte));
+
+            return null ;*/
         }
     }
 }

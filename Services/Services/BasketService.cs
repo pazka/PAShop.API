@@ -24,8 +24,18 @@ namespace Services.Services
             var email = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
 
             User user = _userRepository.Get(u => u.Email == email.Value).SingleOrDefault();
+            if (user == null)
+            {
+                return new Basket();
+            }
+
             Basket basket = _repository.Get(b => b.Owner.Id == user.Id && b.State == BasketState.NotValidated)
                 .SingleOrDefault();
+
+            if(basket == null)
+            {
+                return new Basket();
+            }
 
             foreach (BasketItem basketItem in basket.BasketItems) {
                 basketItem.Item = _itemRepository.Get(i => i.Id == basketItem.ItemId).SingleOrDefault();
